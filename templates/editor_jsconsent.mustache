@@ -1,0 +1,63 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_brandable/editor_jsconsent
+
+    Text of the consent to the generated JavaScript, under a request needing it (contract 12.7, spec B3): plain text,
+    escaped; accepting turns the JavaScript on and sends the request again.
+
+    Context variables required for this template:
+    * generationid - Request needing the JavaScript
+    * version - Version of the text, empty if it could not be read
+    * paragraphs - Paragraphs of the text
+    * current - Whether the JavaScript is already on with this version (the request is only sent again)
+    * warning - Shown above the text (it changed since it was shown), empty if none
+    * errormessage - Why the text could not be read, empty if it was
+
+    Example context (json):
+    {
+        "generationid": 12,
+        "version": "2026-11-02",
+        "paragraphs": ["By turning the JavaScript on, you allow Brandable to generate modules.", "Each module runs with the rights of each visitor."],
+        "current": false,
+        "warning": "",
+        "errormessage": ""
+    }
+}}
+{{#warning}}<div class="tbe-error" role="alert">{{warning}}</div>{{/warning}}
+{{#errormessage}}<div class="tbe-error" role="alert">{{errormessage}}</div>{{/errormessage}}
+{{#current}}
+    <p class="mb-0">{{#str}} jsactivation:alreadyon, theme_brandable {{/str}}</p>
+    <div class="tbe-jsconsent-actions">
+        <button type="button" class="btn btn-sm btn-primary" data-action="jsresend" data-generation="{{generationid}}">{{#str}} jsactivation:resend, theme_brandable {{/str}}</button>
+        <button type="button" class="tbe-link" data-action="jscancel" data-generation="{{generationid}}">{{#str}} cancel {{/str}}</button>
+    </div>
+{{/current}}
+{{^current}}
+    {{#version}}
+        <div class="tbe-jsconsent-text" data-region="jsconsenttext" tabindex="0">
+            {{#paragraphs}}<p>{{.}}</p>{{/paragraphs}}
+        </div>
+        <p class="tbe-hint mb-0">{{#str}} jsconsent:version, theme_brandable, {{version}} {{/str}}</p>
+    {{/version}}
+    <div class="tbe-jsconsent-actions">
+        {{#version}}
+            <button type="button" class="btn btn-sm tbe-btn-accent" data-action="jsaccept" data-generation="{{generationid}}" data-version="{{version}}">{{#str}} jsactivation:accept, theme_brandable {{/str}}</button>
+        {{/version}}
+        <button type="button" class="tbe-link" data-action="jscancel" data-generation="{{generationid}}">{{#str}} cancel {{/str}}</button>
+    </div>
+{{/current}}

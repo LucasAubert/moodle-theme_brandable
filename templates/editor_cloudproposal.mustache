@@ -1,0 +1,44 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_brandable/editor_cloudproposal
+
+    Banner of the version of the project proposed to this environment from another one (spec C15): who, when, the
+    message, and the changes from the version published here, pull or dismiss.
+
+    Context variables required for this template:
+    * number, note - Version proposed; from - environment it comes from
+    * author, message, createdat - The proposal
+
+    Example context (json):
+    {
+        "id": "5d0f", "versionid": "9c2d", "number": 12, "note": "Barre de navigation bleu foncé.",
+        "from": "Préproduction", "author": "Paul Durand", "message": "À valider avant la rentrée",
+        "createdat": 1793849945
+    }
+}}
+<div class="tbe-jsreview-title">
+    <strong>{{#str}} cloud:proposal:banner, theme_brandable, { "number": {{number}}, "from": {{#quote}}{{from}}{{/quote}} } {{/str}}</strong>
+    <span class="tbe-hint">{{#author}}{{#str}} cloud:proposal:by, theme_brandable, {{author}} {{/str}} · {{/author}}{{#userdate}} {{createdat}}, {{#str}} strftimedatetimeshort, core_langconfig {{/str}} {{/userdate}}</span>
+</div>
+{{#note}}<div class="tbe-version-note">{{note}}</div>{{/note}}
+{{#message}}<blockquote class="tbe-version-note mb-1">{{message}}</blockquote>{{/message}}
+<div class="tbe-jsconsent-actions">
+    <button type="button" class="tbe-link" data-action="cloudproposalchanges">{{#str}} cloud:proposal:changes, theme_brandable {{/str}}</button>
+    <button type="button" class="btn btn-sm tbe-btn-accent" data-action="cloudpull">{{#str}} cloud:proposal:pull, theme_brandable {{/str}}</button>
+    <button type="button" class="btn btn-sm btn-secondary" data-action="clouddismiss">{{#str}} cloud:proposal:dismiss, theme_brandable {{/str}}</button>
+</div>

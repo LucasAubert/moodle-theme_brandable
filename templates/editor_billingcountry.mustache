@@ -1,0 +1,40 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_brandable/editor_billingcountry
+
+    Billing country asked before the first purchase of the organisation (sent with the purchase).
+
+    Context variables required for this template:
+    * countries - Countries ({code, name, selected})
+
+    Example context (json):
+    {
+        "countries": [{"code": "BE", "name": "Belgique", "selected": false}, {"code": "FR", "name": "France", "selected": true}]
+    }
+}}
+<div class="tbe-billingcountry">
+    <label class="tbe-hint d-block mb-0">{{#str}} account:billingcountry, theme_brandable {{/str}}
+    <select class="custom-select form-select form-select-sm" data-region="billingcountry">
+        <option value="">{{#str}} account:choosecountry, theme_brandable {{/str}}</option>
+        {{#countries}}
+            <option value="{{code}}"{{#selected}} selected{{/selected}}>{{name}}</option>
+        {{/countries}}
+    </select>
+    </label>
+    <div class="tbe-hint">{{#str}} account:billingcountry_help, theme_brandable {{/str}}</div>
+</div>

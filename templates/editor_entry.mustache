@@ -1,0 +1,168 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_brandable/editor_entry
+
+    One entry of the editor thread: a revision (prompt, then summary, changes and actions), a failed attempt
+    (prompt, then error) or a question of the generator (prompt, then question), with the steps of its generation
+    folded.
+
+    Context variables required for this template:
+    * isquestion - Whether the entry is a question; question, isopen (waiting for the answer), isanswered
+    * isjs - The question is a request needing the generated JavaScript (question: why); jspending (not sent again
+      yet), canmanagejs (the user turns it on), jsenabled (it is on: the request can be sent again)
+    * isanswer - Whether the prompt answers a question
+    * isfailed - Whether the entry is a failed attempt
+    * id, prompt, summary, author, timecreated, changecount, changes, haschanges - Revision; a JavaScript change has
+      apis (hasapis), findings ([{line, column, message}], hasfindings) and jsblocked (errors of the analysis: never run)
+    * isdraft, ispublished, inactive, abandoned, canrestore - Revision state
+    * generationid, errormessage, retryable - Failed attempt (retryable: service failure, credits or plan)
+    * resumable - Failed attempt whose fonts could not be downloaded (tried again with the same result)
+    * accountaction - Failed because of the account: what is offered (theme_brandable/editor_accountaction)
+    * hassteps, runs - Steps of the generation
+
+    Example context (json):
+    {
+        "isfailed": true,
+        "generationid": 7,
+        "prompt": "Make it pop",
+        "errormessage": "The service is temporarily overloaded, try again in a few minutes.",
+        "retryable": true,
+        "timecreated": 1791400100,
+        "hassteps": false,
+        "runs": []
+    }
+}}
+{{#isquestion}}
+    <div class="tbe-entry tbe-question{{#isopen}} is-open{{/isopen}}" data-generation="{{generationid}}">
+        {{> theme_brandable/editor_answerto}}<div class="tbe-bubble-user">{{prompt}}</div>
+        <div class="tbe-bubble-reply is-question">
+            <div class="tbe-question-title">
+                {{#isjs}}
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>
+                    {{#str}} jsactivation:title, theme_brandable {{/str}}
+                {{/isjs}}
+                {{^isjs}}
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4.5M12 17.5h.01"/></svg>
+                    {{#str}} question, theme_brandable {{/str}}
+                {{/isjs}}
+            </div>
+            <div class="tbe-question-text">{{question}}</div>
+            {{#isjs}}{{#jspending}}
+                {{#canmanagejs}}
+                    <button type="button" class="btn btn-sm tbe-btn-accent" data-action="jsactivate" data-generation="{{generationid}}">{{#str}} jsactivation:activate, theme_brandable {{/str}}</button>
+                {{/canmanagejs}}
+                {{^canmanagejs}}
+                    {{#jsenabled}}
+                        <button type="button" class="btn btn-sm btn-primary" data-action="jsresend" data-generation="{{generationid}}">{{#str}} jsactivation:resend, theme_brandable {{/str}}</button>
+                    {{/jsenabled}}
+                    {{^jsenabled}}<p class="tbe-question-hint">{{#str}} jsactivation:askadmin, theme_brandable {{/str}}</p>{{/jsenabled}}
+                {{/canmanagejs}}
+                <div class="tbe-jsconsent" data-region="jsconsent" hidden></div>
+            {{/jspending}}{{/isjs}}
+            {{^isjs}}{{#isopen}}
+                <p class="tbe-question-hint">{{#str}} question_hint, theme_brandable {{/str}}</p>
+                <button type="button" class="btn btn-sm btn-primary" data-action="answer" data-generation="{{generationid}}">{{#str}} question_answer, theme_brandable {{/str}}</button>
+            {{/isopen}}{{/isjs}}
+            <div class="tbe-meta">
+                {{#isjs}}<span class="tbe-badge">{{#jspending}}{{#str}} jsactivation:pending, theme_brandable {{/str}}{{/jspending}}{{^jspending}}{{#str}} jsactivation:resent, theme_brandable {{/str}}{{/jspending}}</span>{{/isjs}}
+                {{^isjs}}{{^isopen}}<span class="tbe-badge">{{#isanswered}}{{#str}} question_answered, theme_brandable {{/str}}{{/isanswered}}{{^isanswered}}{{#str}} question_unanswered, theme_brandable {{/str}}{{/isanswered}}</span>{{/isopen}}{{/isjs}}
+                <span>{{#userdate}} {{timecreated}}, {{#str}} strftimedatetimeshort, core_langconfig {{/str}} {{/userdate}}</span>
+            </div>
+            {{> theme_brandable/editor_steps}}
+        </div>
+    </div>
+{{/isquestion}}
+{{^isquestion}}
+{{#isfailed}}
+    <div class="tbe-entry tbe-failed" data-generation="{{generationid}}">
+        {{> theme_brandable/editor_answerto}}<div class="tbe-bubble-user">{{prompt}}</div>
+        <div class="tbe-bubble-reply is-failed">
+            <div class="tbe-error" role="alert">{{errormessage}}</div>
+            {{#accountaction}}{{> theme_brandable/editor_accountaction}}{{/accountaction}}
+            <div class="tbe-meta"><span>{{#str}} failedattempt, theme_brandable {{/str}}</span>
+                <span>{{#userdate}} {{timecreated}}, {{#str}} strftimedatetimeshort, core_langconfig {{/str}} {{/userdate}}</span></div>
+            {{#retryable}}
+                <button type="button" class="btn btn-sm btn-outline-primary tbe-retry" data-action="retry" data-generation="{{generationid}}"
+                    title="{{#str}} retry_help, theme_brandable {{/str}}">{{#str}} retry, theme_brandable {{/str}}</button>
+            {{/retryable}}
+            {{#resumable}}
+                <button type="button" class="btn btn-sm btn-outline-primary tbe-retry" data-action="retry" data-generation="{{generationid}}"
+                    title="{{#str}} retryfonts_help, theme_brandable {{/str}}">{{#str}} retry, theme_brandable {{/str}}</button>
+            {{/resumable}}
+            {{> theme_brandable/editor_steps}}
+        </div>
+    </div>
+{{/isfailed}}
+{{^isfailed}}
+    <div class="tbe-entry{{#isdraft}} is-draft{{/isdraft}}{{#inactive}} is-inactive{{/inactive}}{{#abandoned}} is-abandoned{{/abandoned}}" data-revision="{{id}}">
+        {{#prompt}}{{> theme_brandable/editor_answerto}}<div class="tbe-bubble-user">{{prompt}}</div>{{/prompt}}
+        <div class="tbe-bubble-reply">
+            <div>{{#summary}}{{summary}}{{/summary}}{{^summary}}{{#str}} nosummary, theme_brandable {{/str}}{{/summary}}</div>
+            <div class="tbe-meta">
+                <span>{{#str}} revisionnumber, theme_brandable, {{id}} {{/str}}</span>
+                <span>{{#str}} changecount, theme_brandable, {{changecount}} {{/str}}</span>
+                <span title="{{author}}">{{#userdate}} {{timecreated}}, {{#str}} strftimedatetimeshort, core_langconfig {{/str}} {{/userdate}}</span>
+                {{#isdraft}}<span class="tbe-badge is-draft">{{#str}} draft, theme_brandable {{/str}}</span>{{/isdraft}}
+                {{#ispublished}}<span class="tbe-badge is-published">{{#str}} published, theme_brandable {{/str}}</span>{{/ispublished}}
+                {{#abandoned}}<span class="tbe-badge is-abandoned">{{#str}} abandoned, theme_brandable {{/str}}</span>{{/abandoned}}
+            {{^abandoned}}{{#inactive}}<span class="tbe-badge">{{#str}} undone, theme_brandable {{/str}}</span>{{/inactive}}{{/abandoned}}
+            </div>
+            {{#haschanges}}
+                <ul class="tbe-changes">
+                    {{#changes}}
+                        <li>
+                            <span class="tbe-change-type">{{type}}</span>
+                            <code class="tbe-change-target">{{target}}</code>
+                            {{#deleted}}<span class="tbe-badge">{{#str}} removed, theme_brandable {{/str}}</span>{{/deleted}}
+                            {{^deleted}}
+                                {{#canrescope}}
+                                    <details class="tbe-scope">
+                                        <summary class="tbe-badge tbe-scope-badge" title="{{#str}} changescope, theme_brandable {{/str}}">{{scopelabel}}</summary>
+                                        <div class="tbe-scope-menu">
+                                            {{#scopeoptions}}
+                                                <button type="button" class="tbe-link" data-action="rescope" data-change="{{id}}"
+                                                    data-level="{{level}}" data-value="{{value}}">{{label}}</button>
+                                            {{/scopeoptions}}
+                                            {{^scopeoptions}}<span class="tbe-hint">{{#str}} scopeoptions_none, theme_brandable {{/str}}</span>{{/scopeoptions}}
+                                        </div>
+                                    </details>
+                                {{/canrescope}}
+                                {{^canrescope}}<span class="tbe-badge">{{scopelabel}}</span>{{/canrescope}}
+                                {{#jsblocked}}<span class="tbe-badge is-abandoned">{{#str}} js:blocked, theme_brandable {{/str}}</span>{{/jsblocked}}
+                                {{#jsunsigned}}<span class="tbe-badge">{{#str}} js:unsigned, theme_brandable {{/str}}</span>{{/jsunsigned}}
+                                {{#hasapis}}
+                                    <div class="tbe-js-apis tbe-hint">{{#str}} js:apis, theme_brandable {{/str}} {{#apis}}<code>{{.}}</code> {{/apis}}</div>
+                                {{/hasapis}}
+                                {{#hasfindings}}
+                                    <ul class="tbe-js-findings">
+                                        {{#findings}}<li class="tbe-hint">{{#line}}{{#str}} js:findingline, theme_brandable, {{line}} {{/str}} {{/line}}{{message}}</li>{{/findings}}
+                                    </ul>
+                                {{/hasfindings}}
+                            {{/deleted}}
+                        </li>
+                    {{/changes}}
+                </ul>
+            {{/haschanges}}
+            {{#canrestore}}
+                <button type="button" class="tbe-link" data-action="restore" data-revision="{{id}}">{{#str}} restore, theme_brandable {{/str}}</button>
+            {{/canrestore}}
+            {{> theme_brandable/editor_steps}}
+        </div>
+    </div>
+{{/isfailed}}
+{{/isquestion}}

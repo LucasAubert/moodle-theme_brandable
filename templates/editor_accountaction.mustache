@@ -1,0 +1,75 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_brandable/editor_accountaction
+
+    What the editor offers under a generation that failed because of the account: connect the site, link it again,
+    buy credits or a paid plan (direct payment, or the Brandable page when the offers cannot be read), or update the
+    plugin (isupgrade, upgradeurl: page of the installation of Brandable).
+
+    Context variables required for this template:
+    * isconnect, isrelink, isoffers - Kind of action
+    * canmanage - Whether the user can act (moodle/site:config)
+    * connecturl, sesskey - Connection page
+    * hasoffers, fallbackurl, label - Offers read (see theme_brandable/editor_offers); the Brandable page otherwise
+
+    Example context (json):
+    {
+        "isoffers": true,
+        "canmanage": true,
+        "label": "Rechargez vos crédits, puis renvoyez le prompt :",
+        "hasoffers": true,
+        "showpacks": true,
+        "creditpacks": [{"id": "pack_100", "label": "100 crédits, 20,00 €"}],
+        "fallbackurl": "",
+        "showprices": true,
+        "taxnote": "Prix hors taxes. Taxes éventuelles en sus selon le pays.",
+        "countrysupported": true,
+        "billingcontacturl": ""
+    }
+}}
+<div class="tbe-accountaction">
+    {{#isupgrade}}
+        {{^canmanage}}<div class="tbe-hint">{{#str}} pluginupdate:askadmin, theme_brandable {{/str}}</div>{{/canmanage}}
+        {{#canmanage}}{{#upgradeurl}}<a class="btn btn-sm tbe-btn-accent" href="{{upgradeurl}}" target="_blank" rel="noopener">{{#str}} pluginupdate:install, theme_brandable {{/str}}</a>{{/upgradeurl}}{{/canmanage}}
+    {{/isupgrade}}
+    {{^isupgrade}}
+    {{^canmanage}}<div class="tbe-hint">{{#str}} action:askadmin, theme_brandable {{/str}}</div>{{/canmanage}}
+    {{#canmanage}}
+        {{#isconnect}}
+            <a class="btn btn-sm tbe-btn-accent" href="{{connecturl}}">{{#str}} connect:button, theme_brandable {{/str}}</a>
+        {{/isconnect}}
+        {{#isrelink}}
+            <form method="post" action="{{connecturl}}" class="d-inline">
+                <input type="hidden" name="sesskey" value="{{sesskey}}">
+                <input type="hidden" name="action" value="relink">
+                <button type="submit" class="btn btn-sm tbe-btn-accent">{{#str}} connect:relink, theme_brandable {{/str}}</button>
+            </form>
+        {{/isrelink}}
+        {{#isoffers}}
+            <div class="tbe-hint">{{label}}</div>
+            {{#hasoffers}}{{> theme_brandable/editor_offers }}{{/hasoffers}}
+            {{^hasoffers}}
+                {{#countrysupported}}
+                    {{#fallbackurl}}<a class="btn btn-sm btn-primary" href="{{fallbackurl}}" target="_blank" rel="noopener">{{#str}} action:fallback, theme_brandable {{/str}}</a>{{/fallbackurl}}
+                {{/countrysupported}}
+                {{> theme_brandable/editor_pricing }}
+            {{/hasoffers}}
+        {{/isoffers}}
+    {{/canmanage}}
+    {{/isupgrade}}
+</div>

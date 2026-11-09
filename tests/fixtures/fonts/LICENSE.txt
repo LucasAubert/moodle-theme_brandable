@@ -1,0 +1,4 @@
+Test fixture of the demo generator (fonts of the catalogue, contract 11.6): font.woff2 is
+fa-v4compatibility.woff2 of Font Awesome Free 6.5.2, copied from Moodle (lib/fonts), licensed
+under the SIL Open Font License 1.1 (https://openfontlicense.org). It stands for a file of the
+catalogue in the tests; it is not Montserrat.

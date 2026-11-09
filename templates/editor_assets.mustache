@@ -1,0 +1,114 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_brandable/editor_assets
+
+    Panel "Images and fonts" of the editor: library (thumbnails, font previews), attachment to the prompt, edition,
+    deletion, new images and fonts.
+
+    Context variables required for this template:
+    * loaded - Whether the library could be read
+    * count, max - Number of assets, largest library
+    * images, fonts - Kind shown
+    * weights - Font weights of the new font form ({value, selected})
+    * assets - Assets of the kind shown (see theme_brandable_get_assets), plus isfont, italic, used, usagelabel,
+      editing, attached, weights
+
+    Example context (json):
+    {
+        "loaded": true, "count": 1, "max": 200, "images": true, "fonts": false,
+        "weights": [{"value": 400, "selected": true}],
+        "assets": [{"id": 1, "slug": "campus-hiver", "kind": "image", "mime": "image/png", "width": 2560, "height": 1440,
+            "alt": "Le campus", "url": "https://example.com/a.png", "thumbnailurl": "https://example.com/t.png",
+            "used": true, "usagelabel": "Published version", "editing": false, "attached": false, "isfont": false}]
+    }
+}}
+<div class="tbe-assets-head">
+    <h2 class="tbe-account-title">{{#str}} assets, theme_brandable {{/str}}</h2>
+    <span class="tbe-hint">{{#str}} assets:count, theme_brandable, { "count": {{count}}, "max": {{max}} } {{/str}}</span>
+    <button type="button" class="tbe-iconbtn" data-action="closeassets" title="{{#str}} closebuttontitle {{/str}}" aria-label="{{#str}} closebuttontitle {{/str}}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+</div>
+<div class="tbe-assets-tabs" role="group">
+    <button type="button" class="btn btn-sm {{#images}}btn-primary{{/images}}{{^images}}btn-outline-primary{{/images}}" data-action="assetsfilter" data-kind="image" aria-pressed="{{#images}}true{{/images}}{{^images}}false{{/images}}">{{#str}} assets:images, theme_brandable {{/str}}</button>
+    <button type="button" class="btn btn-sm {{#fonts}}btn-primary{{/fonts}}{{^fonts}}btn-outline-primary{{/fonts}}" data-action="assetsfilter" data-kind="font" aria-pressed="{{#fonts}}true{{/fonts}}{{^fonts}}false{{/fonts}}">{{#str}} assets:fonts, theme_brandable {{/str}}</button>
+</div>
+{{^loaded}}<p class="tbe-hint">{{#str}} assets:unavailable, theme_brandable {{/str}}</p>{{/loaded}}
+{{#images}}
+    <p class="tbe-hint">{{#str}} assets:imageshelp, theme_brandable {{/str}}</p>
+    <button type="button" class="btn btn-sm btn-outline-secondary mb-2" data-action="addimages">{{#str}} assets:addimages, theme_brandable {{/str}}</button>
+{{/images}}
+{{#fonts}}
+    <form class="tbe-assets-form" data-region="fontform">
+        <label>{{#str}} assets:fontfile, theme_brandable {{/str}} <input type="file" name="font" accept=".woff2,font/woff2" required></label>
+        <label>{{#str}} assets:family, theme_brandable {{/str}} <input type="text" name="family" maxlength="100" required></label>
+        <label>{{#str}} assets:weight, theme_brandable {{/str}}
+            <select name="weight">{{#weights}}<option value="{{value}}" {{#selected}}selected{{/selected}}>{{value}}</option>{{/weights}}</select>
+        </label>
+        <label>{{#str}} assets:style, theme_brandable {{/str}}
+            <select name="style"><option value="normal">{{#str}} assets:stylenormal, theme_brandable {{/str}}</option><option value="italic">{{#str}} assets:styleitalic, theme_brandable {{/str}}</option></select>
+        </label>
+        <label>{{#str}} assets:licencefile, theme_brandable {{/str}} <input type="file" name="licence" accept=".txt,.md,text/plain,text/markdown"></label>
+        <button type="submit" class="btn btn-sm btn-outline-secondary">{{#str}} assets:addfont, theme_brandable {{/str}}</button>
+    </form>
+{{/fonts}}
+<ul class="tbe-assets-list">
+    {{#assets}}
+    <li class="tbe-asset" data-region="asset" data-slug="{{slug}}">
+        <div class="tbe-asset-preview">
+            {{#isfont}}<span class="tbe-asset-font" style="font-family: 'tbe-font-{{id}}', sans-serif; font-weight: {{weight}};{{#italic}} font-style: italic;{{/italic}}">Aa Bb 123</span>{{/isfont}}
+            {{^isfont}}{{#thumbnailurl}}<img src="{{thumbnailurl}}" alt="" loading="lazy">{{/thumbnailurl}}{{^thumbnailurl}}<img src="{{url}}" alt="" loading="lazy">{{/thumbnailurl}}{{/isfont}}
+        </div>
+        <div class="tbe-asset-body">
+            <div class="tbe-asset-slug">{{slug}}</div>
+            <div class="tbe-hint">
+                {{#isfont}}{{family}} · {{weight}} · {{style}}{{#subset}} · {{subset}}{{/subset}}{{#licence}} · {{licence}}{{/licence}}{{/isfont}}
+                {{^isfont}}{{width}} × {{height}}{{#favicononly}} · {{#str}} assets:favicononly, theme_brandable {{/str}}{{/favicononly}}{{/isfont}}
+            </div>
+            {{#used}}<div class="tbe-asset-usage">{{#str}} assets:usedby, theme_brandable, {{usagelabel}} {{/str}}</div>{{/used}}
+            <div class="tbe-asset-actions">
+                {{^isfont}}
+                    {{^attached}}<button type="button" class="tbe-link" data-action="attachasset" data-id="{{id}}">{{#str}} assets:attach, theme_brandable {{/str}}</button>{{/attached}}
+                    {{#attached}}<span class="tbe-hint">{{#str}} assets:attached, theme_brandable {{/str}}</span>{{/attached}}
+                {{/isfont}}
+                <button type="button" class="tbe-link" data-action="editasset" data-id="{{id}}" aria-expanded="{{#editing}}true{{/editing}}{{^editing}}false{{/editing}}">{{#str}} edit {{/str}}</button>
+                <button type="button" class="tbe-link tbe-link-danger" data-action="deleteasset" data-id="{{id}}" {{#used}}disabled title="{{#str}} assets:usedby, theme_brandable, {{usagelabel}} {{/str}}"{{/used}}>{{#str}} delete {{/str}}</button>
+            </div>
+            {{#editing}}
+            <form class="tbe-assets-form" data-region="assetform" data-id="{{id}}">
+                <label>{{#str}} assets:slug, theme_brandable {{/str}}
+                    <input type="text" name="slug" value="{{slug}}" maxlength="64" pattern="[a-z0-9]+(-[a-z0-9]+)*" {{#used}}readonly title="{{#str}} asset:error:slugused, theme_brandable {{/str}}"{{/used}} required>
+                </label>
+                {{^isfont}}<label>{{#str}} assets:alt, theme_brandable {{/str}} <input type="text" name="alt" value="{{alt}}" maxlength="250"></label>{{/isfont}}
+                {{#isfont}}
+                    <label>{{#str}} assets:family, theme_brandable {{/str}} <input type="text" name="family" value="{{family}}" maxlength="100" required></label>
+                    <label>{{#str}} assets:weight, theme_brandable {{/str}}
+                        <select name="weight">{{#weights}}<option value="{{value}}" {{#selected}}selected{{/selected}}>{{value}}</option>{{/weights}}</select>
+                    </label>
+                    <label>{{#str}} assets:style, theme_brandable {{/str}}
+                        <select name="style"><option value="normal" {{^italic}}selected{{/italic}}>{{#str}} assets:stylenormal, theme_brandable {{/str}}</option><option value="italic" {{#italic}}selected{{/italic}}>{{#str}} assets:styleitalic, theme_brandable {{/str}}</option></select>
+                    </label>
+                {{/isfont}}
+                <button type="submit" class="btn btn-sm btn-primary">{{#str}} savechanges {{/str}}</button>
+            </form>
+            {{/editing}}
+        </div>
+    </li>
+    {{/assets}}
+</ul>
+{{#loaded}}{{^assets}}<p class="tbe-hint">{{#images}}{{#str}} assets:noimages, theme_brandable {{/str}}{{/images}}{{#fonts}}{{#str}} assets:nofonts, theme_brandable {{/str}}{{/fonts}}</p>{{/assets}}{{/loaded}}

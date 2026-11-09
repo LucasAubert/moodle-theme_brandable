@@ -1,0 +1,216 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_brandable/editor
+
+    Brandable editor: chat and revision history on the left, preview iframe on the right.
+    Rendered with the parent theme; only relies on a few Bootstrap classes common to Bootstrap 4 and 5. Styles in
+    styles/editor.css (loaded by editor.php).
+
+    Context variables required for this template:
+    * previewurl - URL first loaded in the preview iframe
+    * wwwroot - Site root URL
+    * exiturl - URL leaving the editor (and the preview mode)
+    * settingsurl - Brandable settings URL
+    * generatoravailable - Whether prompts can be sent
+    * generatorname - Name of the active generator
+    * connected - Whether prompts can be sent (site connected to Brandable, or dev mode); otherwise the chat is
+      replaced by the connection screen
+    * canconnect - Whether the user can connect the site (moodle/site:config)
+    * pluginupdate - Banner of a new version of the plugin (theme_brandable/editor_pluginupdate), administrators only
+    * exporturl - Export of the published version, empty without moodle/site:config
+    * importurl - Import of an exported theme, empty without moodle/site:config
+    * connecturl, sesskey - Connection page: the button starts the connection flow (account created on Brandable)
+    * termsurl, privacyurl - Terms and privacy policy of Brandable (see theme_brandable/connect_disclosure)
+    * countries - Countries offered as billing country ([{code, name}], JSON), defaultcountry - The one preselected
+    * markers - Whether the template markers are enabled in the preview
+    * colourmodes - Colour modes of the site: available, enabled, default (JSON)
+    * colourmodesenabled - Whether the colour modes are on (light / dark switch of the preview)
+    * user - Personal data of the current user, removed from the captured elements (JSON)
+
+    Example context (json):
+    {
+        "previewurl": "https://example.com/",
+        "wwwroot": "https://example.com",
+        "exiturl": "https://example.com/theme/brandable/preview.php?sesskey=abc",
+        "settingsurl": "https://example.com/admin/settings.php?section=themesettingbrandable",
+        "generatoravailable": true,
+        "generatorname": "Demo generator",
+        "connected": true,
+        "canconnect": true,
+        "connecturl": "https://example.com/theme/brandable/connect.php",
+        "exporturl": "https://example.com/theme/brandable/export.php",
+        "importurl": "https://example.com/theme/brandable/import.php",
+        "sesskey": "abc",
+        "countries": "[]",
+        "defaultcountry": "FR",
+        "markers": true,
+        "colourmodes": "{\"available\":true,\"enabled\":true,\"default\":\"light\"}",
+        "colourmodesenabled": true,
+        "user": "{}"
+    }
+}}
+<div class="tbe" data-region="theme-brandable-editor" data-wwwroot="{{wwwroot}}" data-user="{{user}}"
+    data-connecturl="{{connecturl}}" data-exporturl="{{exporturl}}" data-importurl="{{importurl}}" data-canmanage="{{#canconnect}}1{{/canconnect}}"
+    data-countries="{{countries}}" data-defaultcountry="{{defaultcountry}}" data-colourmodes="{{colourmodes}}">
+    <aside class="tbe-sidebar">
+        <header class="tbe-header">
+            <div class="tbe-brand">
+                {{> theme_brandable/brand_mark }}
+                <span class="tbe-title">{{#str}} pluginname, theme_brandable {{/str}}</span>
+            </div>
+            <div class="tbe-header-links">
+                <button type="button" class="tbe-iconbtn" data-action="assets" aria-expanded="false" aria-controls="tbe-assets" title="{{#str}} assets, theme_brandable {{/str}}" aria-label="{{#str}} assets, theme_brandable {{/str}}" {{^connected}}hidden{{/connected}}>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+                </button>
+                <button type="button" class="tbe-iconbtn" data-action="history" aria-expanded="false" aria-controls="tbe-history" title="{{#str}} cloud:history, theme_brandable {{/str}}" aria-label="{{#str}} cloud:history, theme_brandable {{/str}}" {{^connected}}hidden{{/connected}}>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                </button>
+                <button type="button" class="tbe-iconbtn" data-action="account" aria-expanded="false" aria-controls="tbe-account" title="{{#str}} account, theme_brandable {{/str}}" aria-label="{{#str}} account, theme_brandable {{/str}}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+                </button>
+                <a href="{{settingsurl}}" class="tbe-iconbtn" title="{{#str}} settings {{/str}}" aria-label="{{#str}} settings {{/str}}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </a>
+                <a href="{{exiturl}}" class="tbe-iconbtn" title="{{#str}} exiteditor, theme_brandable {{/str}}" aria-label="{{#str}} exiteditor, theme_brandable {{/str}}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </a>
+            </div>
+        </header>
+
+        <div class="tbe-toolbar-left">
+            <div class="tbe-group">
+                <button type="button" class="tbe-iconbtn" data-action="undo" title="{{#str}} undo, theme_brandable {{/str}}" aria-label="{{#str}} undo, theme_brandable {{/str}}" disabled>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+                </button>
+                <button type="button" class="tbe-iconbtn" data-action="redo" title="{{#str}} redo, theme_brandable {{/str}}" aria-label="{{#str}} redo, theme_brandable {{/str}}" disabled>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg>
+                </button>
+            </div>
+            <div class="tbe-status" data-region="status" aria-live="polite"></div>
+            <div class="tbe-group">
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-action="discard" aria-label="{{#str}} discard, theme_brandable {{/str}}" disabled>{{#str}} discardshort, theme_brandable {{/str}}</button>
+                <button type="button" class="btn btn-sm tbe-btn-accent" data-action="publish" disabled>{{#str}} publish, theme_brandable {{/str}}</button>
+            </div>
+        </div>
+
+        <div class="tbe-account" id="tbe-account" data-region="account" hidden></div>
+        <div class="tbe-account tbe-assets" id="tbe-assets" data-region="assets" hidden></div>
+        <div class="tbe-account tbe-jsreview" id="tbe-history" data-region="history" role="region" aria-label="{{#str}} cloud:history, theme_brandable {{/str}}" hidden></div>
+        <div class="tbe-account tbe-jsreview" id="tbe-jsreview" data-region="jsreview" role="region" aria-label="{{#str}} jsreview, theme_brandable {{/str}}" hidden></div>
+        <div class="tbe-connect" data-region="connect" {{#connected}}hidden{{/connected}}>
+            <h2 class="tbe-connect-title">{{#str}} connect:freetitle, theme_brandable {{/str}}</h2>
+            <p>{{#str}} connect:editorintro, theme_brandable {{/str}}</p>
+            {{#canconnect}}
+                {{> theme_brandable/connect_disclosure }}
+                <form method="post" action="{{connecturl}}">
+                    <input type="hidden" name="sesskey" value="{{sesskey}}">
+                    <input type="hidden" name="action" value="start">
+                    <button type="submit" class="btn btn-lg w-100 tbe-btn-accent">{{#str}} connect:startfree, theme_brandable {{/str}}</button>
+                </form>
+                <p class="tbe-hint mt-2">{{#str}} connect:nopassword, theme_brandable {{/str}}</p>
+            {{/canconnect}}
+            {{^canconnect}}
+                <p class="tbe-hint">{{#str}} connect:askadmin, theme_brandable {{/str}}</p>
+            {{/canconnect}}
+        </div>
+        <div class="tbe-proposal" data-region="cloudproposal" role="status" hidden></div>
+        {{#pluginupdate}}{{> theme_brandable/editor_pluginupdate }}{{/pluginupdate}}
+        <div class="tbe-upgrade" data-region="pluginupgrade" hidden></div>
+        <div class="tbe-thread" data-region="thread" aria-live="polite" {{^connected}}hidden{{/connected}}></div>
+
+        <form class="tbe-composer" data-region="composer" autocomplete="off" {{^connected}}hidden{{/connected}}>
+            <div class="tbe-lowcredits" data-region="lowcredits" hidden>
+                <span data-region="lowcreditslabel"></span>
+                <button type="button" class="tbe-link" data-action="recharge">{{#str}} account:recharge, theme_brandable {{/str}}</button>
+            </div>
+            <div class="tbe-answering" data-region="answering" hidden>
+                <div class="tbe-answering-label">{{#str}} question_answering, theme_brandable {{/str}}</div>
+                <div class="tbe-answering-question" data-region="answeringquestion"></div>
+                <div class="tbe-answering-selection" data-region="answeringselection" hidden></div>
+                <button type="button" class="tbe-link" data-action="newrequest">{{#str}} question_newrequest, theme_brandable {{/str}}</button>
+            </div>
+            <div class="tbe-promptbox">
+                <div class="tbe-selection" data-region="selection" hidden>
+                    <span class="tbe-selection-label" data-region="selectionlabel"></span>
+                    <button type="button" class="tbe-iconbtn tbe-selection-remove" data-action="removeselection" title="{{#str}} removeselection, theme_brandable {{/str}}" aria-label="{{#str}} removeselection, theme_brandable {{/str}}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <div class="tbe-attachments" data-region="attachments" hidden></div>
+                <div class="tbe-hint" data-region="assetsstatus" aria-live="polite"></div>
+                <input type="file" data-region="imagefiles" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml,.svg,.ico" multiple hidden>
+                <label for="tbe-prompt" class="sr-only visually-hidden">{{#str}} prompt, theme_brandable {{/str}}</label>
+                <textarea id="tbe-prompt" name="prompt" rows="3" data-region="prompt"
+                    placeholder="{{#str}} promptplaceholder, theme_brandable {{/str}}" {{^generatoravailable}}disabled{{/generatoravailable}}></textarea>
+                <div class="tbe-composer-footer">
+                    <button type="button" class="tbe-iconbtn" data-action="pick" aria-pressed="false" title="{{#str}} pick_help, theme_brandable {{/str}}" aria-label="{{#str}} pick, theme_brandable {{/str}}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l7 17 2.5-7.5L20 10z"/><path d="m13 13 6 6"/></svg>
+                    </button>
+                    <button type="button" class="tbe-iconbtn" data-action="attachimages" title="{{#str}} assets:attachimages, theme_brandable {{/str}}" aria-label="{{#str}} assets:attachimages, theme_brandable {{/str}}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                    </button>
+                    <span class="tbe-hint">{{#generatoravailable}}{{generatorname}}{{/generatoravailable}}{{^generatoravailable}}{{#str}} generatorunavailable, theme_brandable {{/str}}{{/generatoravailable}}</span>
+                    <button type="submit" class="btn btn-sm tbe-btn-accent" data-action="send" {{^generatoravailable}}disabled{{/generatoravailable}}>{{#str}} send, theme_brandable {{/str}}</button>
+                </div>
+            </div>
+        </form>
+    </aside>
+
+    <main class="tbe-preview">
+        <div class="tbe-toolbar-right">
+            <button type="button" class="tbe-iconbtn" data-action="reload" title="{{#str}} reload, theme_brandable {{/str}}" aria-label="{{#str}} reload, theme_brandable {{/str}}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36L21 8"/><path d="M21 3v5h-5"/></svg>
+            </button>
+            <form class="tbe-urlbar" data-region="urlbar">
+                <label for="tbe-url" class="sr-only visually-hidden">{{#str}} previewurl, theme_brandable {{/str}}</label>
+                <input id="tbe-url" type="text" data-region="url" spellcheck="false" value="{{previewurl}}">
+            </form>
+            <label class="tbe-switch tbe-jssuspend" data-region="jssuspend" title="{{#str}} jssuspend_help, theme_brandable {{/str}}" hidden>
+                <input type="checkbox" data-action="jssuspend">
+                <span>{{#str}} jssuspend, theme_brandable {{/str}}</span>
+            </label>
+            <label class="tbe-switch" title="{{#str}} disablemarkers_help, theme_brandable {{/str}}">
+                <input type="checkbox" data-action="togglemarkers" {{^markers}}checked{{/markers}}>
+                <span>{{#str}} disablemarkers, theme_brandable {{/str}}</span>
+            </label>
+            {{#colourmodesenabled}}
+            <button type="button" class="tbe-iconbtn" data-action="previewmode" aria-pressed="false" title="{{#str}} previewdark, theme_brandable {{/str}}" aria-label="{{#str}} previewdark, theme_brandable {{/str}}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+            </button>
+            {{/colourmodesenabled}}
+            <div class="tbe-group tbe-devices" role="group" aria-label="{{#str}} device, theme_brandable {{/str}}">
+                <button type="button" class="tbe-iconbtn active" data-device="desktop" aria-pressed="true" title="{{#str}} device_desktop, theme_brandable {{/str}}" aria-label="{{#str}} device_desktop, theme_brandable {{/str}}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                </button>
+                <button type="button" class="tbe-iconbtn" data-device="tablet" aria-pressed="false" title="{{#str}} device_tablet, theme_brandable {{/str}}" aria-label="{{#str}} device_tablet, theme_brandable {{/str}}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M11 18h2"/></svg>
+                </button>
+                <button type="button" class="tbe-iconbtn" data-device="mobile" aria-pressed="false" title="{{#str}} device_mobile, theme_brandable {{/str}}" aria-label="{{#str}} device_mobile, theme_brandable {{/str}}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+                </button>
+            </div>
+        </div>
+        <div class="tbe-notice" data-region="previewnotice" role="alert" hidden>
+            <span>{{#str}} previewinactive, theme_brandable {{/str}}</span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-action="reactivate">{{#str}} reactivatepreview, theme_brandable {{/str}}</button>
+        </div>
+        <div class="tbe-stage" data-region="stage" data-device="desktop">
+            <iframe class="tbe-frame" data-region="frame" src="{{previewurl}}" title="{{#str}} previewframe, theme_brandable {{/str}}"></iframe>
+        </div>
+    </main>
+</div>

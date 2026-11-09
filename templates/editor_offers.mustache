@@ -1,0 +1,100 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_brandable/editor_offers
+
+    Offers of the account panel and of the 402/403 errors: one card per plan for one site (monthly or yearly price),
+    one card for the plans for several sites (pricing page, no direct payment), the credit packs apart, then the
+    tax mention, billing country and billing contact (theme_brandable/editor_pricing).
+
+    Context variables required for this template:
+    * showplans - Whether the plans are offered
+    * plans - [{planid, name, description, credits, prices: [{id, interval, price, note, always}]}]
+    * hasyearly, yearly - Monthly / yearly switch shown; yearly prices shown
+    * multisites, hasmultisites, pricingurl - Plans for several sites ([{label}]); public pricing page
+    * showpacks, creditpacks, packstitle - Credit packs ({id, label}); title of the block
+    * See theme_brandable/editor_pricing for the mention under the offers
+
+    Example context (json):
+    {
+        "showplans": true,
+        "hasyearly": true,
+        "yearly": false,
+        "plans": [{"planid": "site_local", "name": "Essentiel", "description": "Pour un site Moodle : prod + préproduction.",
+            "credits": "300 crédits par mois", "prices": [
+            {"id": "site_local_monthly", "interval": "month", "price": "29,00 € par mois", "note": "", "always": false,
+                "current": true},
+            {"id": "site_local_yearly", "interval": "year", "price": "290,00 € par an", "note": "soit 24,17 € par mois",
+                "always": false}]}],
+        "hasmultisites": true,
+        "multisites": [{"label": "Multi-sites 10 : 3000 crédits par mois"}],
+        "pricingurl": "https://app.brandablelms.com/pricing?currency=eur",
+        "showpacks": true,
+        "packstitle": "Besoin de plus de crédits ?",
+        "creditpacks": [{"id": "credits_100", "label": "100 crédits, 10,00 €"}],
+        "showprices": true,
+        "taxnote": "Prix hors taxes. Taxes éventuelles en sus selon le pays.",
+        "countrysupported": true,
+        "billingcontacturl": ""
+    }
+}}
+<div class="tbe-offers" data-region="offers" data-interval="{{#yearly}}year{{/yearly}}{{^yearly}}month{{/yearly}}">
+    {{#countrysupported}}
+        {{#showplans}}
+            <div class="tbe-offers-head">
+                {{#hasyearly}}
+                    <div class="btn-group btn-group-sm tbe-interval" role="group" aria-label="{{#str}} account:billinginterval, theme_brandable {{/str}}">
+                        <button type="button" class="btn {{^yearly}}btn-primary{{/yearly}}{{#yearly}}btn-outline-primary{{/yearly}}" data-action="interval" data-interval="month" aria-pressed="{{^yearly}}true{{/yearly}}{{#yearly}}false{{/yearly}}">{{#str}} account:intervalmonth, theme_brandable {{/str}}</button>
+                        <button type="button" class="btn {{#yearly}}btn-primary{{/yearly}}{{^yearly}}btn-outline-primary{{/yearly}}" data-action="interval" data-interval="year" aria-pressed="{{#yearly}}true{{/yearly}}{{^yearly}}false{{/yearly}}">{{#str}} account:intervalyear, theme_brandable {{/str}}</button>
+                    </div>
+                {{/hasyearly}}
+                {{#pricingurl}}<a class="tbe-hint" href="{{pricingurl}}" target="_blank" rel="noopener">{{#str}} account:compare, theme_brandable {{/str}}</a>{{/pricingurl}}
+            </div>
+            {{#plans}}
+                <div class="tbe-plan" data-plan="{{planid}}">
+                    <div class="tbe-plan-name">{{name}}</div>
+                    {{#description}}<div class="tbe-plan-description">{{description}}</div>{{/description}}
+                    <div class="tbe-plan-credits">{{credits}}</div>
+                    {{#prices}}
+                        <div class="tbe-plan-price" data-interval="{{interval}}" {{#always}}data-always="1"{{/always}}>
+                            {{#price}}<div class="tbe-plan-amount">{{price}}</div>{{/price}}
+                            {{#note}}<div class="tbe-hint">{{note}}</div>{{/note}}
+                            {{#current}}<span class="tbe-badge is-published" data-region="currentoffer">{{#str}} account:currentoffer, theme_brandable {{/str}}</span>{{/current}}
+                            {{^current}}<button type="button" class="btn btn-sm tbe-btn-accent" data-action="checkout" data-kind="plan" data-item="{{id}}">{{#str}} account:chooseplan, theme_brandable, {{name}} {{/str}}</button>{{/current}}
+                        </div>
+                    {{/prices}}
+                </div>
+            {{/plans}}
+            {{#hasmultisites}}
+                <div class="tbe-plan tbe-plan-multisites" data-region="multisites">
+                    <div class="tbe-plan-name">{{#str}} account:multisites, theme_brandable {{/str}}</div>
+                    <div class="tbe-plan-description">{{#multisites}}<div>{{label}}{{#current}} <span class="tbe-badge is-published">{{#str}} account:currentoffer, theme_brandable {{/str}}</span>{{/current}}</div>{{/multisites}}</div>
+                    {{#pricingurl}}<a class="btn btn-sm btn-outline-primary" href="{{pricingurl}}" target="_blank" rel="noopener">{{#str}} account:multisiteslink, theme_brandable {{/str}}</a>{{/pricingurl}}
+                </div>
+            {{/hasmultisites}}
+        {{/showplans}}
+        {{#showpacks}}
+            <div class="tbe-packs" data-region="accountrecharge">
+                {{#packstitle}}<div class="tbe-account-subtitle">{{packstitle}}</div>{{/packstitle}}
+                {{#creditpacks}}
+                    <button type="button" class="btn btn-sm btn-outline-secondary tbe-pack" data-action="checkout" data-kind="credits" data-item="{{id}}">{{label}}</button>
+                {{/creditpacks}}
+            </div>
+        {{/showpacks}}
+    {{/countrysupported}}
+    {{> theme_brandable/editor_pricing }}
+</div>

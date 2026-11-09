@@ -1,0 +1,96 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_brandable/editor_clouddiff
+
+    Comparison of two versions of the project, or of a version with the one published here (spec C14): by override
+    then by asset, with the findings of Brandable. The line diffs are put in the details by the browser (textContent).
+
+    Context variables required for this template:
+    * fromnumber, tonumber - Versions compared (fromnumber 0: nothing published here, everything is added)
+    * versionid, restorable - Version compared, and whether it can be restored here
+    * changes - [{status, statuslabel, type, target, scopelabel}]; assets - [{status, statuslabel, key, kind, licence}]
+    * findings - [{severity, target, message, blocking}]
+    * notindexed, notexact, moodleversion - Templates of this Moodle release unknown, or compared with a close one
+    * errormessage - Why the diff could not be read
+
+    Example context (json):
+    {
+        "fromnumber": 1, "tonumber": 2, "hasfrom": true, "versionid": "9c2d", "restorable": true,
+        "changes": [{"status": "modified", "statuslabel": "Modifié", "type": "scss", "target": "post/navbar",
+            "scopelabel": "Tout le site", "index": 0}],
+        "haschanges": true,
+        "assets": [{"status": "added", "statuslabel": "Ajouté", "key": "logo", "kind": "image", "licence": false, "index": 0}],
+        "hasassets": true, "empty": false,
+        "findings": [{"severity": "warning", "target": "core/navbar", "message": "The original template differs.",
+            "blocking": false}],
+        "hasfindings": true, "notindexed": false, "notexact": false, "moodleversion": "4.5.6", "errormessage": ""
+    }
+}}
+<div class="tbe-jsreview-header">
+    <button type="button" class="tbe-link" data-action="cloudback">{{#str}} cloud:diff:back, theme_brandable {{/str}}</button>
+    <button type="button" class="tbe-iconbtn" data-action="history" title="{{#str}} closebuttontitle {{/str}}" aria-label="{{#str}} closebuttontitle {{/str}}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+</div>
+{{#errormessage}}<div class="tbe-error" role="alert">{{errormessage}}</div>{{/errormessage}}
+{{^errormessage}}
+    <h2 class="tbe-account-title h6">
+        {{#hasfrom}}{{#str}} cloud:diff:title, theme_brandable, { "from": {{fromnumber}}, "to": {{tonumber}} } {{/str}}{{/hasfrom}}
+        {{^hasfrom}}{{#str}} cloud:history:version, theme_brandable, {{tonumber}} {{/str}}{{/hasfrom}}
+    </h2>
+    {{^hasfrom}}<p class="tbe-hint">{{#str}} cloud:diff:nothinghere, theme_brandable {{/str}}</p>{{/hasfrom}}
+    {{#notindexed}}<div class="tbe-notice-inline tbe-hint" role="status">{{#str}} cloud:diff:notindexed, theme_brandable, {{moodleversion}} {{/str}}</div>{{/notindexed}}
+    {{#notexact}}<div class="tbe-notice-inline tbe-hint" role="status">{{#str}} cloud:diff:notexact, theme_brandable, {{moodleversion}} {{/str}}</div>{{/notexact}}
+    {{#hasfindings}}
+        <p class="mb-1">{{#str}} cloud:report:findings, theme_brandable {{/str}}</p>
+        <ul class="tbe-hint">{{#findings}}<li{{#blocking}} class="text-danger"{{/blocking}}>{{#target}}<code>{{target}}</code> : {{/target}}{{message}}</li>{{/findings}}</ul>
+    {{/hasfindings}}
+    {{#empty}}<p class="tbe-hint">{{#str}} cloud:diff:none, theme_brandable {{/str}}</p>{{/empty}}
+    {{#haschanges}}
+        <h3 class="h6 mt-2">{{#str}} cloud:diff:changes, theme_brandable {{/str}}</h3>
+        <ul class="tbe-clouddiff">
+            {{#changes}}
+                <li>
+                    <details data-region="clouddiffitem" data-group="changes" data-index="{{index}}">
+                        <summary><span class="tbe-badge is-{{status}}">{{statuslabel}}</span> <code>{{type}}</code> {{target}} <span class="tbe-hint">· {{scopelabel}}</span></summary>
+                    </details>
+                </li>
+            {{/changes}}
+        </ul>
+    {{/haschanges}}
+    {{#hasassets}}
+        <h3 class="h6 mt-2">{{#str}} cloud:diff:assets, theme_brandable {{/str}}</h3>
+        <ul class="tbe-clouddiff">
+            {{#assets}}
+                <li>
+                    {{#licence}}
+                        <details data-region="clouddiffitem" data-group="assets" data-index="{{index}}">
+                            <summary><span class="tbe-badge is-{{status}}">{{statuslabel}}</span> {{#str}} cloud:diff:licence, theme_brandable, {{key}} {{/str}}</summary>
+                        </details>
+                    {{/licence}}
+                    {{^licence}}<span class="tbe-badge is-{{status}}">{{statuslabel}}</span> <code>{{kind}}</code> {{key}}{{/licence}}
+                </li>
+            {{/assets}}
+        </ul>
+    {{/hasassets}}
+    {{#restorable}}
+        <div class="tbe-jsconsent-actions mt-2">
+            <button type="button" class="btn btn-sm btn-secondary" data-action="cloudrestore" data-version="{{versionid}}" data-number="{{tonumber}}">{{#str}} cloud:restore, theme_brandable {{/str}}</button>
+        </div>
+    {{/restorable}}
+{{/errormessage}}

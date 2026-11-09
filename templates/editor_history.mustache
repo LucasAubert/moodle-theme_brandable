@@ -1,0 +1,88 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_brandable/editor_history
+
+    History of the versions of the project in the cloud of the Pro offer (spec C8): the versions, the one this site
+    runs, the other environments; without the cloud, the Pro offer.
+
+    Context variables required for this template:
+    * full, read, none - Rights of the site; readonlyuntil - end of the reading only (read)
+    * environment, currentnumber - This site and the version it runs
+    * environments - Other environments: name, kind, number (0: none)
+    * versions - id, number, localnumber, note, author, publishedat, environment, publishedin, current
+    * proposable - Whether a version can be proposed to another environment (full access, other environments)
+    * nextcursor - Next page; versionsurl - page of the versions in Brandable; upgradeitem - offer with the cloud
+    * errormessage - Why the history could not be read
+
+    Example context (json):
+    {
+        "full": true, "read": false, "none": false, "readonlyuntil": "",
+        "environment": "Dev 4.5", "currentnumber": 2,
+        "environments": [{"name": "Dev 5.1", "kind": "dev", "number": 0, "hasnumber": false}],
+        "hasenvironments": true,
+        "versions": [{"id": "9c2d", "number": 2, "localnumber": 1, "note": "Barre bleue.", "author": "Admin User",
+            "publishedat": 1793849945, "environment": "Dev 4.5", "publishedin": "Dev 4.5", "current": true}],
+        "hasversions": true, "proposable": true, "nextcursor": "", "versionsurl": "https://app.brandablelms.com/dashboard/projects/p1/versions",
+        "upgradeitem": "site_cloud_monthly", "errormessage": ""
+    }
+}}
+<div class="tbe-jsreview-header">
+    <h2 class="tbe-account-title h6 mb-0">{{#str}} cloud:history, theme_brandable {{/str}}</h2>
+    <button type="button" class="tbe-iconbtn" data-action="history" title="{{#str}} closebuttontitle {{/str}}" aria-label="{{#str}} closebuttontitle {{/str}}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+</div>
+{{#errormessage}}<div class="tbe-error" role="alert">{{errormessage}}</div>{{/errormessage}}
+{{#none}}
+    <p>{{#str}} cloud:history:none, theme_brandable {{/str}}</p>
+    {{#upgradeitem}}<button type="button" class="btn btn-sm tbe-btn-accent" data-action="checkout" data-kind="plan" data-item="{{upgradeitem}}">{{#str}} cloud:history:upgrade, theme_brandable {{/str}}</button>{{/upgradeitem}}
+{{/none}}
+{{^none}}
+    {{#read}}<div class="tbe-notice-inline tbe-hint" role="status">{{#str}} cloud:history:readonly, theme_brandable, {{readonlyuntil}} {{/str}}</div>{{/read}}
+    <p class="tbe-hint mb-1">{{#str}} cloud:history:intro, theme_brandable {{/str}}</p>
+    <div class="tbe-hint">{{#str}} cloud:history:here, theme_brandable, {{environment}} {{/str}} · {{#currentnumber}}{{#str}} cloud:history:version, theme_brandable, {{currentnumber}} {{/str}}{{/currentnumber}}{{^currentnumber}}{{#str}} cloud:history:nothing, theme_brandable {{/str}}{{/currentnumber}}</div>
+    {{#hasenvironments}}
+        <div class="tbe-hint">{{#str}} cloud:history:environments, theme_brandable {{/str}} :
+            {{#environments}}<span class="tbe-badge">{{name}} · {{#hasnumber}}{{#str}} cloud:history:version, theme_brandable, {{number}} {{/str}}{{/hasnumber}}{{^hasnumber}}{{#str}} cloud:history:nothing, theme_brandable {{/str}}{{/hasnumber}}</span> {{/environments}}
+        </div>
+    {{/hasenvironments}}
+    {{#versionsurl}}<a class="tbe-link" href="{{versionsurl}}" target="_blank" rel="noopener">{{#str}} cloud:history:openversions, theme_brandable {{/str}}</a>{{/versionsurl}}
+    <div class="tbe-hint" data-region="cloudpicked" role="status" hidden>{{#str}} cloud:compare:picked, theme_brandable {{/str}}</div>
+    <ol class="tbe-history" data-region="historylist">
+        {{#versions}}
+            <li class="tbe-history-version{{#current}} is-current{{/current}}" data-version="{{id}}" data-number="{{number}}">
+                <div class="tbe-jsreview-title">
+                    <strong>{{#str}} cloud:history:version, theme_brandable, {{number}} {{/str}}</strong>
+                    {{#current}}<span class="tbe-badge is-published">{{#str}} cloud:history:current, theme_brandable {{/str}}</span>{{/current}}
+                    <span class="tbe-hint">{{#str}} cloud:history:from, theme_brandable, {{environment}} {{/str}} · {{#userdate}} {{publishedat}}, {{#str}} strftimedatetimeshort, core_langconfig {{/str}} {{/userdate}}{{#author}} · {{author}}{{/author}}</span>
+                </div>
+                {{#note}}<div class="tbe-version-note">{{note}}</div>{{/note}}
+                {{#publishedin}}<div class="tbe-hint">{{#str}} cloud:history:publishedin, theme_brandable, {{publishedin}} {{/str}}</div>{{/publishedin}}
+                {{#missing}}<div class="tbe-hint"><span class="tbe-badge is-modified">{{#str}} pluginupdate:versionneeds, theme_brandable {{/str}}</span> {{#str}} pluginupdate:versionneedsdetail, theme_brandable, {{missing}} {{/str}}</div>{{/missing}}
+                <div class="tbe-jsconsent-actions">
+                    {{^current}}<button type="button" class="tbe-link" data-action="cloudcompare" data-version="{{id}}">{{#str}} cloud:compare, theme_brandable {{/str}}</button>{{/current}}
+                    <button type="button" class="tbe-link" data-action="cloudpick" data-version="{{id}}" data-number="{{number}}" aria-pressed="false">{{#str}} cloud:compare:pick, theme_brandable {{/str}}</button>
+                    {{^current}}{{^missing}}<button type="button" class="tbe-link" data-action="cloudrestore" data-version="{{id}}" data-number="{{number}}">{{#str}} cloud:restore, theme_brandable {{/str}}</button>{{/missing}}{{/current}}
+                    {{#proposable}}<button type="button" class="tbe-link" data-action="cloudpropose" data-version="{{id}}" data-number="{{number}}">{{#str}} cloud:propose, theme_brandable {{/str}}</button>{{/proposable}}
+                </div>
+            </li>
+        {{/versions}}
+    </ol>
+    {{^hasversions}}<p class="tbe-hint">{{#str}} cloud:history:empty, theme_brandable {{/str}}</p>{{/hasversions}}
+    {{#nextcursor}}<button type="button" class="tbe-link" data-action="cloudmore" data-cursor="{{nextcursor}}">{{#str}} cloud:history:more, theme_brandable {{/str}}</button>{{/nextcursor}}
+{{/none}}

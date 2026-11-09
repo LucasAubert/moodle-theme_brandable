@@ -1,0 +1,58 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_brandable/editor_pricing
+
+    Under the prices of the offers: the tax mention and the billing contact; when Brandable does not sell in the billing
+    country of the organisation, the contact only (no payment).
+
+    Context variables required for this template:
+    * showprices - Whether prices are shown above
+    * taxnote - Mention shown with every price
+    * countrysupported - Whether online payment is available in the billing country
+    * billingcontacturl - Billing contact page (may be empty)
+    * countryrequired, countries - The billing country is asked before a purchase ([{code, name, selected}])
+    * countrylocked, billingcountry - The billing country fixed at the first payment (shown, not asked)
+
+    Example context (json):
+    {
+        "showprices": true,
+        "taxnote": "Prix hors taxes. Taxes éventuelles en sus selon le pays.",
+        "countrysupported": true,
+        "billingcontacturl": "https://app.brandablelms.com/billing/contact",
+        "countryrequired": true,
+        "countries": [{"code": "FR", "name": "France", "selected": true}]
+    }
+}}
+{{#countrysupported}}
+    {{#showprices}}
+        {{#countryrequired}}{{> theme_brandable/editor_billingcountry }}{{/countryrequired}}
+        {{#countrylocked}}
+            <div class="tbe-hint" data-region="billingcountrylocked">{{#str}} account:billingcountrylocked, theme_brandable, {{billingcountry}} {{/str}}</div>
+        {{/countrylocked}}
+        <div class="tbe-hint tbe-pricing" data-region="taxnote">{{taxnote}}</div>
+        {{#billingcontacturl}}
+            <a class="tbe-hint" href="{{billingcontacturl}}" target="_blank" rel="noopener">{{#str}} account:billingcontact, theme_brandable {{/str}}</a>
+        {{/billingcontacturl}}
+    {{/showprices}}
+{{/countrysupported}}
+{{^countrysupported}}
+    <div class="tbe-hint" data-region="countrynotsupported">{{#str}} account:countrynotsupported, theme_brandable {{/str}}</div>
+    {{#billingcontacturl}}
+        <a class="btn btn-sm btn-outline-primary" href="{{billingcontacturl}}" target="_blank" rel="noopener">{{#str}} account:contactbilling, theme_brandable {{/str}}</a>
+    {{/billingcontacturl}}
+{{/countrysupported}}

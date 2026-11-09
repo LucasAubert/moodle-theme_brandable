@@ -1,0 +1,114 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_brandable/connect
+
+    Page "Connect Brandable": state of the connection, sign-in on the Brandable web app, relink, disconnection.
+
+    Context variables required for this template:
+    * connected - Whether the site holds a site key
+    * canrelink - Whether the site was linked to an environment before (relink after a site mismatch)
+    * organization, project, environment, plan - What the site is linked to
+    * hascredits, credits - Credits available, when the account could be read
+    * dashboardurl - Brandable dashboard, empty if unknown
+    * disconnecterror - Why Brandable could not revoke the key (offers to forget it locally)
+    * devmode - Whether dev mode is on
+    * actionurl - URL of the page (the forms post to it)
+    * sesskey - Session key
+    * editorurl - URL of the editor
+    * termsurl, privacyurl - Terms and privacy policy of Brandable (see theme_brandable/connect_disclosure)
+
+    Example context (json):
+    {
+        "connected": true,
+        "canrelink": true,
+        "organization": "Université X",
+        "project": "Moodle principal",
+        "environment": "Production",
+        "plan": "Pro",
+        "hascredits": true,
+        "credits": 120,
+        "dashboardurl": "https://app.brandablelms.com/dashboard",
+        "disconnecterror": "",
+        "devmode": false,
+        "actionurl": "https://example.com/theme/brandable/connect.php",
+        "sesskey": "abc",
+        "editorurl": "https://example.com/theme/brandable/editor.php",
+        "termsurl": "https://brandablelms.com/en/terms",
+        "privacyurl": "https://brandablelms.com/en/privacy"
+    }
+}}
+<div class="theme-brandable-connect tbe-page">
+    {{#connected}}
+        <p>{{#str}} connect:connected, theme_brandable {{/str}}</p>
+        <dl class="row">
+            <dt class="col-sm-3">{{#str}} account:organization, theme_brandable {{/str}}</dt><dd class="col-sm-9">{{organization}}</dd>
+            <dt class="col-sm-3">{{#str}} account:project, theme_brandable {{/str}}</dt><dd class="col-sm-9">{{project}}</dd>
+            <dt class="col-sm-3">{{#str}} account:environment, theme_brandable {{/str}}</dt><dd class="col-sm-9">{{environment}}</dd>
+            <dt class="col-sm-3">{{#str}} account:plan, theme_brandable {{/str}}</dt><dd class="col-sm-9">{{plan}}</dd>
+            {{#hascredits}}<dt class="col-sm-3">{{#str}} account:credits, theme_brandable {{/str}}</dt><dd class="col-sm-9">{{credits}}</dd>{{/hascredits}}
+        </dl>
+        <p>
+            <a class="btn tbe-btn-accent" href="{{editorurl}}">{{#str}} editor, theme_brandable {{/str}}</a>
+            {{#dashboardurl}}<a class="btn btn-secondary" href="{{dashboardurl}}" target="_blank" rel="noopener">{{#str}} account:dashboard, theme_brandable {{/str}}</a>{{/dashboardurl}}
+        </p>
+        {{#disconnecterror}}
+            <div class="alert alert-danger" role="alert">
+                <p>{{#str}} account:disconnectfailed, theme_brandable {{/str}} {{disconnecterror}}</p>
+                <p>{{#str}} account:revokefromdashboard, theme_brandable {{/str}}</p>
+                <form method="post" action="{{actionurl}}">
+                    <input type="hidden" name="sesskey" value="{{sesskey}}">
+                    <input type="hidden" name="action" value="forget">
+                    <button type="submit" class="btn btn-danger">{{#str}} account:forgetlocally, theme_brandable {{/str}}</button>
+                </form>
+            </div>
+        {{/disconnecterror}}
+        <form method="post" action="{{actionurl}}" class="mt-3">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="action" value="start">
+            <button type="submit" class="btn btn-outline-secondary">{{#str}} connect:reconnect, theme_brandable {{/str}}</button>
+            <span class="text-muted small ms-2 ml-2">{{#str}} connect:reconnect_help, theme_brandable {{/str}}</span>
+        </form>
+        <form method="post" action="{{actionurl}}" class="mt-3">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="action" value="disconnect">
+            <button type="submit" class="btn btn-outline-danger">{{#str}} account:disconnect, theme_brandable {{/str}}</button>
+            <span class="text-muted small ms-2 ml-2">{{#str}} account:disconnect_help, theme_brandable {{/str}}</span>
+        </form>
+    {{/connected}}
+    {{^connected}}
+        <p>{{#str}} connect:intro, theme_brandable {{/str}}</p>
+        <p class="text-muted">{{#str}} connect:nopassword, theme_brandable {{/str}}</p>
+        {{> theme_brandable/connect_disclosure }}
+        <form method="post" action="{{actionurl}}" class="d-inline">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="action" value="start">
+            <button type="submit" class="btn tbe-btn-accent">{{#str}} connect:button, theme_brandable {{/str}}</button>
+        </form>
+    {{/connected}}
+    {{#canrelink}}
+        <form method="post" action="{{actionurl}}" class="mt-3">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="action" value="relink">
+            <button type="submit" class="btn btn-link px-0">{{#str}} connect:relink, theme_brandable {{/str}}</button>
+            <span class="text-muted small">{{#str}} connect:relink_help, theme_brandable {{/str}}</span>
+        </form>
+    {{/canrelink}}
+    {{#devmode}}
+        <p class="mt-3 small text-muted">{{#str}} connect:devmode, theme_brandable {{/str}}</p>
+    {{/devmode}}
+</div>

@@ -1,0 +1,50 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_brandable/editor_pluginupdate
+
+    Banner of a new version of the plugin, for the administrators of the site (spec U3): release, notes, link of the
+    installation (the update page of Moodle once the release is on the Plugins Directory). A security update cannot
+    be closed.
+
+    Context variables required for this template:
+    * release, version - New version; security - security update; dismissible - whether it can be closed
+    * notes, hasnotes - Release notes (HTML, cleaned); url, hasurl - where to update; moodle - update page of Moodle
+
+    Example context (json):
+    {
+        "release": "0.2.0", "version": 2026120100, "security": false, "dismissible": true,
+        "notes": "<ul><li>Mises à jour du plugin signalées dans l'éditeur.</li></ul>", "hasnotes": true,
+        "url": "https://app.brandablelms.com/dashboard/install", "hasurl": true, "moodle": false
+    }
+}}
+<div class="tbe-proposal tbe-pluginupdate{{#security}} is-security{{/security}}" data-region="pluginupdate" data-version="{{version}}" role="status">
+    <div class="tbe-jsreview-title">
+        {{#security}}<span class="tbe-badge is-removed">{{#str}} pluginupdate:securitybadge, theme_brandable {{/str}}</span>{{/security}}
+        <strong>{{#str}} pluginupdate:banner, theme_brandable, {{release}} {{/str}}</strong>
+    </div>
+    {{#hasnotes}}
+        <details class="tbe-pluginupdate-notes">
+            <summary>{{#str}} pluginupdate:notes, theme_brandable {{/str}}</summary>
+            <div class="tbe-version-note">{{{notes}}}</div>
+        </details>
+    {{/hasnotes}}
+    <div class="tbe-jsconsent-actions">
+        {{#hasurl}}<a class="btn btn-sm btn-outline-secondary" href="{{url}}"{{^moodle}} target="_blank" rel="noopener"{{/moodle}}>{{#moodle}}{{#str}} pluginupdate:moodleupdate, theme_brandable {{/str}}{{/moodle}}{{^moodle}}{{#str}} pluginupdate:install, theme_brandable {{/str}}{{/moodle}}</a>{{/hasurl}}
+        {{#dismissible}}<button type="button" class="tbe-link" data-action="dismissupdate" data-version="{{version}}">{{#str}} pluginupdate:dismiss, theme_brandable {{/str}}</button>{{/dismissible}}
+    </div>
+</div>

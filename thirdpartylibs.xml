@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<libraries>
+  <library>
+    <location>lib/svg-sanitize</location>
+    <name>svg-sanitize</name>
+    <description>SVG sanitizer (allowlist of elements and attributes), used on the SVG images uploaded to the Brandable library.</description>
+    <version>1.1.1</version>
+    <license>GPL</license>
+    <licenseversion>2.0+</licenseversion>
+    <repository>https://github.com/darylldoyle/svg-sanitizer</repository>
+    <copyrights>
+      <copyright>Daryll Doyle</copyright>
+    </copyrights>
+  </library>
+</libraries>

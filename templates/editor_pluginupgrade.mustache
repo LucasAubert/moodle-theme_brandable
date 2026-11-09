@@ -1,0 +1,49 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_brandable/editor_pluginupgrade
+
+    Screen of the editor when Brandable requires a newer plugin (426 plugin_upgrade_required, spec U2): it replaces
+    the thread and the composer; what is local (publish, undo, preview, export) stays available.
+
+    Context variables required for this template:
+    * message - Message of Brandable; release - release installed; latestrelease, haslatest - latest release
+    * canupdate - whether the user can update the plugin; url, hasurl - page of the installation of Brandable
+    * installaddonurl - Install plugins page of Moodle, empty if not offered
+
+    Example context (json):
+    {
+        "message": "Cette version du plugin Brandable n'est plus prise en charge. Installez la dernière version.",
+        "release": "0.1.1", "latestrelease": "0.2.0", "haslatest": true, "canupdate": true,
+        "url": "https://app.brandablelms.com/dashboard/install", "hasurl": true,
+        "installaddonurl": "https://moodle.example.com/admin/tool/installaddon/index.php"
+    }
+}}
+<div class="tbe-upgrade-screen" role="alert">
+    <h2 class="tbe-connect-title">{{#str}} pluginupdate:requiredtitle, theme_brandable {{/str}}</h2>
+    <p>{{message}}</p>
+    <p class="tbe-hint">
+        {{#str}} pluginupdate:installed, theme_brandable, {{release}} {{/str}}
+        {{#haslatest}}<br>{{#str}} pluginupdate:latest, theme_brandable, {{latestrelease}} {{/str}}{{/haslatest}}
+    </p>
+    {{#canupdate}}
+        {{#hasurl}}<a class="btn tbe-btn-accent" href="{{url}}" target="_blank" rel="noopener">{{#str}} pluginupdate:install, theme_brandable {{/str}}</a>{{/hasurl}}
+        {{#installaddonurl}}<p class="mt-2 mb-0"><a class="tbe-link" href="{{installaddonurl}}">{{#str}} pluginupdate:installaddon, theme_brandable {{/str}}</a></p>{{/installaddonurl}}
+    {{/canupdate}}
+    {{^canupdate}}<p class="mb-0">{{#str}} pluginupdate:askadmin, theme_brandable {{/str}}</p>{{/canupdate}}
+    <p class="tbe-hint mt-3 mb-0">{{#str}} pluginupdate:stillworks, theme_brandable {{/str}}</p>
+</div>

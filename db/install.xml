@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="theme/brandable/db" VERSION="20261028" COMMENT="XMLDB file for Moodle theme/brandable"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="theme_brandable_revision" COMMENT="Immutable revisions of the Brandable overrides: those of the session in progress (undo/redo pointers), and the complete revisions of the versions.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="parentrevisionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Parent revision, 0 for the empty root and for a complete revision (version)."/>
+        <FIELD NAME="sessionid" TYPE="char" LENGTH="36" NOTNULL="false" SEQUENCE="false" COMMENT="Session of the revision (UUID), null for the revision of a version."/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Author, 0 when anonymised."/>
+        <FIELD NAME="prompt" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Prompt that produced the revision."/>
+        <FIELD NAME="summary" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Summary of the changes."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="abandoned" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 when the revision failed the verification in the preview and the draft went back to its parent."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="parentrevisionid" UNIQUE="false" FIELDS="parentrevisionid"/>
+        <INDEX NAME="sessionid" UNIQUE="false" FIELDS="sessionid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="theme_brandable_change" COMMENT="Changes (template / scss / js overrides) brought by a revision.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="revisionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="sortorder" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Order of the change within its revision."/>
+        <FIELD NAME="type" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="template, scss or js."/>
+        <FIELD NAME="target" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Template name (component/name) or SCSS chunk (pre/slug, post/slug)."/>
+        <FIELD NAME="content" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Override content, null when deleted."/>
+        <FIELD NAME="deleted" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 when the change removes the override."/>
+        <FIELD NAME="contenthash" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="sha256 of the content."/>
+        <FIELD NAME="sourcehash" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="sha256 of the original filesystem template, computed by the plugin (authoritative). Null for new templates and SCSS."/>
+        <FIELD NAME="remotesourcehash" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="sourceHash sent by the generator, if any."/>
+        <FIELD NAME="needsreview" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 when the generator worked on another source than the one installed."/>
+        <FIELD NAME="moodleversion" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="Moodle release (X.Y.Z) when the change was stored."/>
+        <FIELD NAME="scopelevel" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="site" SEQUENCE="false" COMMENT="site, pagetype, page, course or cm."/>
+        <FIELD NAME="scopevalue" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Page type, page key (bp-*), course id or cm id; null for the site."/>
+        <FIELD NAME="selectors" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="SCSS: selectors of the compiled chunk, scope wrapper included (JSON), for the verification in the preview."/>
+        <FIELD NAME="compiled" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JS: function expression compiled by Brandable (contract 12.3), never changed by the plugin."/>
+        <FIELD NAME="report" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JS: analysis report of Brandable (JSON)."/>
+        <FIELD NAME="signature" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="JS: signature of Brandable, required by the security review (contract 12.6)."/>
+        <FIELD NAME="jsanalyzer" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="JS: version of the analyzer of the report."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="revisionid" TYPE="foreign" FIELDS="revisionid" REFTABLE="theme_brandable_revision" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="theme_brandable_generation" COMMENT="Generations requested from the editor (relayed to the generator, polled by the editor).">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="User who sent the prompt."/>
+        <FIELD NAME="sessionid" TYPE="char" LENGTH="36" NOTNULL="false" SEQUENCE="false" COMMENT="Session the prompt was sent in (UUID)."/>
+        <FIELD NAME="generator" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Generator used."/>
+        <FIELD NAME="remoteid" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Generation id given by the generator."/>
+        <FIELD NAME="prompt" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="pageurl" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Page shown in the preview when the prompt was sent."/>
+        <FIELD NAME="selection" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Element targeted in the preview (JSON), personal data removed."/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Generation whose question the prompt answers."/>
+        <FIELD NAME="attachments" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Ids of the images of the library attached to the prompt (JSON)."/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="running" SEQUENCE="false" COMMENT="running, completed, failed, question, jsactivation or jsresent."/>
+        <FIELD NAME="basedraft" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Draft revision the generation builds upon."/>
+        <FIELD NAME="revisionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Revision created from the result."/>
+        <FIELD NAME="repairs" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Repairs requested after a failed validation."/>
+        <FIELD NAME="remoteevents" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Last events sent by the generator (JSON)."/>
+        <FIELD NAME="localevents" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Events added by the plugin (JSON)."/>
+        <FIELD NAME="summary" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="errorcode" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="errormessage" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Shown as is to the administrator."/>
+        <FIELD NAME="errorurl" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Page where the administrator can act on the error (recharge, plan)."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="timecreated" UNIQUE="false" FIELDS="timecreated"/>
+        <INDEX NAME="sessionid" UNIQUE="false" FIELDS="sessionid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="theme_brandable_version" COMMENT="Published versions kept in Moodle: the current one and the previous one.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="revisionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Complete revision of the version."/>
+        <FIELD NAME="number" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Version number, from 1."/>
+        <FIELD NAME="note" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Version note."/>
+        <FIELD NAME="prompts" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of prompts of the session published."/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Who published, 0 when anonymised."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="clientversionid" TYPE="char" LENGTH="36" NOTNULL="false" SEQUENCE="false" COMMENT="UUID sent to the cloud with this version (idempotence)."/>
+        <FIELD NAME="cloudversionid" TYPE="char" LENGTH="36" NOTNULL="false" SEQUENCE="false" COMMENT="Id of the version in the cloud of the project."/>
+        <FIELD NAME="cloudnumber" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Number of the version in the project."/>
+        <FIELD NAME="cloudstatus" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="pending, synced, failed or paused; null without cloud."/>
+        <FIELD NAME="clouderror" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Error code of the last sending."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="revisionid" TYPE="foreign" FIELDS="revisionid" REFTABLE="theme_brandable_revision" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="theme_brandable_export" COMMENT="Themes exported from the published versions (numbering and changelog of each theme name).">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="themename" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Name of the exported theme, without theme_."/>
+        <FIELD NAME="themeversion" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Version of the exported theme (YYYYMMDDXX)."/>
+        <FIELD NAME="versionnumber" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Brandable version exported."/>
+        <FIELD NAME="note" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Version note written in the changelog."/>
+        <FIELD NAME="licenceid" TYPE="char" LENGTH="36" NOTNULL="false" SEQUENCE="false" COMMENT="Licence of the export (never the key)."/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Who exported, 0 when anonymised."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="themename" UNIQUE="false" FIELDS="themename"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="theme_brandable_asset" COMMENT="Library of images and fonts (files in the asset file area, itemid = id).">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="slug" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" COMMENT="Identity of the asset in the markers."/>
+        <FIELD NAME="kind" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="image or font."/>
+        <FIELD NAME="mime" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Type of the file served."/>
+        <FIELD NAME="width" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Width of the file served (viewBox for an SVG)."/>
+        <FIELD NAME="height" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="alt" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Alternative text of an image."/>
+        <FIELD NAME="family" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Font family."/>
+        <FIELD NAME="weight" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Font weight (1 to 1000)."/>
+        <FIELD NAME="style" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Font style: normal or italic."/>
+        <FIELD NAME="subset" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="Subset of a font file of the catalogue (latin, latin-ext...)."/>
+        <FIELD NAME="origin" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="upload" SEQUENCE="false" COMMENT="upload, google or import."/>
+        <FIELD NAME="licence" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Licence identifier of a font (OFL-1.1...)."/>
+        <FIELD NAME="contenthash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="sha1 of the file served (part of its URL)."/>
+        <FIELD NAME="sha256" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="sha256 of the file served (identity in the cloud, contract 13.3)."/>
+        <FIELD NAME="favicononly" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 for an icon (ico): only for the favicon."/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Who added it, 0 when anonymised."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="slug" UNIQUE="true" FIELDS="slug"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="theme_brandable_fontfamily" COMMENT="Licence of the font families of the catalogue (one per family, contract 11.6).">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="familykey" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Family, lowercase (one entry per family, case ignored)."/>
+        <FIELD NAME="family" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="licence" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="SPDX identifier: OFL-1.1, Apache-2.0 or UFL-1.0."/>
+        <FIELD NAME="licencetext" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Full text of the licence, with the copyright of the family."/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="familykey" UNIQUE="true" FIELDS="familykey"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="theme_brandable_jsconsent" COMMENT="Consents to the generated JavaScript (history: the last one is in effect, contract 12.7).">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Administrator who accepted or turned off."/>
+        <FIELD NAME="version" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Version of the consent text."/>
+        <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 for an activation, 0 for a deactivation."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="theme_brandable_jsreview" COMMENT="Reviews of generated JavaScript modules before publishing (spec B13).">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="contenthash" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" COMMENT="sha256 of the content reviewed."/>
+        <FIELD NAME="target" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Target of the module (js/slug)."/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Reviewer."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="contenthash" UNIQUE="false" FIELDS="contenthash"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="theme_brandable_cloudqueue" COMMENT="Versions to send to the cloud of the Pro offer, in order (contract 13.4).">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="versionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Local version, null once it was deleted."/>
+        <FIELD NAME="clientversionid" TYPE="char" LENGTH="36" NOTNULL="true" SEQUENCE="false" COMMENT="UUID of the version (idempotence)."/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Author of the version, 0 when anonymised."/>
+        <FIELD NAME="payload" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Body of POST /cloud/versions (JSON), built at the publication."/>
+        <FIELD NAME="files" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Where each sha256 of the version is read (JSON)."/>
+        <FIELD NAME="attempts" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="nextattempt" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="lasterror" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Error code of the last attempt."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="versionid" TYPE="foreign" FIELDS="versionid" REFTABLE="theme_brandable_version" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="clientversionid" UNIQUE="true" FIELDS="clientversionid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="theme_brandable_jspublished" COMMENT="JavaScript modules published on this site (spec C12: code never published here is reviewed again).">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="contenthash" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" COMMENT="sha256 of the source published."/>
+        <FIELD NAME="target" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Target of the module (js/slug)."/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="First publication."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="contenthash" UNIQUE="false" FIELDS="contenthash"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

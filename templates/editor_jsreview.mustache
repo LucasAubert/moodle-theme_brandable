@@ -1,0 +1,92 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_brandable/editor_jsreview
+
+    Review of the generated JavaScript before publishing (spec B13). The code and the diff are added by
+    theme_brandable/jsreview with textContent; the analysis comes from Brandable, as plain text.
+
+    Context variables required for this template:
+    * modules - Modules of the draft changed since the published version: index, key, hash, target, scopelabel, isnew,
+      reviewed, analyzer, apis (hasapis), findings (hasfindings) and errors (haserrors): [{line, column, message}]
+    * pending - Modules still to review; allreviewed - none left
+    * canaskbrandable - Whether the security review of Brandable is offered (Pro offer)
+    * canreview - Whether the user records reviews (managejs); otherwise the box is disabled
+    * downloadurl - Download of the JavaScript of the draft
+
+    Example context (json):
+    {
+        "modules": [{"index": 0, "key": "js/welcome-modal", "hash": "ab12", "target": "js/welcome-modal",
+            "scopelabel": "Whole site", "isnew": true, "reviewed": false, "analyzer": "1", "apis": ["b.modal", "b.once"],
+            "hasapis": true, "findings": [], "hasfindings": false, "errors": [], "haserrors": false, "unsigned": false}],
+        "pending": 1,
+        "allreviewed": false,
+        "canaskbrandable": true,
+        "canreview": true,
+        "downloadurl": "https://example.com/theme/brandable/jsdownload.php?draft=1"
+    }
+}}
+<div class="tbe-jsreview-header">
+    <h2 class="tbe-account-title h6 mb-0">{{#str}} jsreview, theme_brandable {{/str}}</h2>
+    <button type="button" class="tbe-iconbtn" data-action="jsreviewclose" title="{{#str}} closebuttontitle {{/str}}" aria-label="{{#str}} closebuttontitle {{/str}}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+</div>
+<p class="tbe-hint">{{#str}} jsreview:intro, theme_brandable {{/str}}</p>
+{{#modules}}
+    <section class="tbe-jsreview-module" data-index="{{index}}" data-region="jsreviewmodule" data-target="{{target}}">
+        <div class="tbe-jsreview-title">
+            <code>{{target}}</code>
+            <span class="tbe-badge">{{scopelabel}}</span>
+            {{#isnew}}<span class="tbe-badge">{{#str}} jsreview:new, theme_brandable {{/str}}</span>{{/isnew}}
+            {{#reviewed}}<span class="tbe-badge is-published">{{#str}} jsreview:reviewed, theme_brandable {{/str}}</span>{{/reviewed}}
+            {{#unsigned}}<span class="tbe-badge">{{#str}} js:unsigned, theme_brandable {{/str}}</span>{{/unsigned}}
+        </div>
+        <div class="tbe-group" role="group">
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-action="jsreviewview" data-view="code" aria-pressed="true">{{#str}} jsreview:code, theme_brandable {{/str}}</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-action="jsreviewview" data-view="diff" aria-pressed="false">{{#isnew}}{{#str}} jsreview:diffnew, theme_brandable {{/str}}{{/isnew}}{{^isnew}}{{#str}} jsreview:diff, theme_brandable {{/str}}{{/isnew}}</button>
+        </div>
+        <div data-region="jsreviewcode"></div>
+        <div data-region="jsreviewdiff" hidden></div>
+        <div class="tbe-jsreview-report">
+            <div class="tbe-hint">{{#str}} jsreview:analysis, theme_brandable, {{analyzer}} {{/str}}</div>
+            {{#hasapis}}<div class="tbe-js-apis tbe-hint">{{#str}} js:apis, theme_brandable {{/str}} {{#apis}}<code>{{.}}</code> {{/apis}}</div>{{/hasapis}}
+            {{#haserrors}}
+                <div class="tbe-error" role="alert">{{#str}} jsreview:errors, theme_brandable {{/str}}</div>
+                <ul class="tbe-js-findings">{{#errors}}<li>{{#line}}{{#str}} js:findingline, theme_brandable, {{line}} {{/str}} {{/line}}{{message}}</li>{{/errors}}</ul>
+            {{/haserrors}}
+            {{#hasfindings}}
+                <ul class="tbe-js-findings">{{#findings}}<li class="tbe-hint">{{#line}}{{#str}} js:findingline, theme_brandable, {{line}} {{/str}} {{/line}}{{message}}</li>{{/findings}}</ul>
+            {{/hasfindings}}
+            {{^hasfindings}}{{^haserrors}}<div class="tbe-hint">{{#str}} jsreview:nofindings, theme_brandable {{/str}}</div>{{/haserrors}}{{/hasfindings}}
+        </div>
+        {{#canaskbrandable}}{{^unsigned}}
+            <button type="button" class="btn btn-sm btn-outline-primary" data-action="jsaskreview">{{#str}} jsreview:ask, theme_brandable {{/str}}</button>
+            <div class="tbe-jsreview-ai" data-region="jsaireview" aria-live="polite" hidden></div>
+        {{/unsigned}}{{/canaskbrandable}}
+        <label class="tbe-jsreview-check">
+            <input type="checkbox" data-action="jsreviewed" {{#reviewed}}checked disabled{{/reviewed}}{{^reviewed}}{{^canreview}}disabled{{/canreview}}{{/reviewed}}>
+            <span>{{#str}} jsreview:check, theme_brandable {{/str}}</span>
+        </label>
+        {{^reviewed}}{{^canreview}}<p class="tbe-hint mb-0">{{#str}} jsreview:askadmin, theme_brandable {{/str}}</p>{{/canreview}}{{/reviewed}}
+    </section>
+{{/modules}}
+<div class="tbe-jsconsent-actions">
+    <button type="button" class="btn btn-sm tbe-btn-accent" data-action="jsreviewpublish" {{^allreviewed}}disabled{{/allreviewed}}>{{#str}} jsreview:publish, theme_brandable {{/str}}</button>
+    {{^allreviewed}}<span class="tbe-hint">{{#str}} jsreview:pending, theme_brandable, {{pending}} {{/str}}</span>{{/allreviewed}}
+    {{#downloadurl}}<a class="tbe-link" href="{{downloadurl}}">{{#str}} jsreview:download, theme_brandable {{/str}}</a>{{/downloadurl}}
+</div>

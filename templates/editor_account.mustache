@@ -1,0 +1,96 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_brandable/editor_account
+
+    Account panel of the editor (GET /api/v1/account): plan, credits, usage, links, purchases, disconnection.
+
+    Context variables required for this template:
+    * available - Whether the account could be read; errormessage otherwise
+    * canmanage - Whether the user can buy and disconnect
+    * organization, project, environment, plan, credits, generations, creditsconsumed - Account
+    * monthly, purchased, periodend - Lines already formatted
+    * dashboardurl, billingportalurl, licencesurl - Brandable pages
+    * Offers: see theme_brandable/editor_offers
+    * disconnecterror - Why Brandable could not revoke the key
+
+    Example context (json):
+    {
+        "available": true,
+        "canmanage": true,
+        "organization": "Université X",
+        "project": "Moodle principal",
+        "environment": "Préproduction",
+        "plan": "Gratuit",
+        "credits": 21,
+        "usage": "Ce mois-ci : 9 génération(s), 9 crédit(s) utilisé(s).",
+        "monthly": "Crédits mensuels : 21 / 30",
+        "purchased": "",
+        "periodend": "",
+        "dashboardurl": "https://app.brandablelms.com/dashboard",
+        "billingportalurl": "",
+        "showpacks": true,
+        "packstitle": "Besoin de plus de crédits ?",
+        "creditpacks": [{"id": "pack_100", "label": "100 crédits, 20,00 €"}],
+        "showplans": false,
+        "plans": [],
+        "showprices": true,
+        "taxnote": "Prix hors taxes. Taxes éventuelles en sus selon le pays.",
+        "countrysupported": true,
+        "billingcontacturl": "https://app.brandablelms.com/billing/contact",
+        "disconnecterror": ""
+    }
+}}
+<div class="tbe-account-inner">
+    <div class="tbe-account-title">{{#str}} account, theme_brandable {{/str}}</div>
+    {{^available}}
+        <p class="tbe-hint">{{#str}} account:unavailable, theme_brandable {{/str}} {{errormessage}}</p>
+    {{/available}}
+    {{#available}}
+        <dl class="tbe-account-list">
+            <dt>{{#str}} account:organization, theme_brandable {{/str}}</dt><dd>{{organization}}</dd>
+            <dt>{{#str}} account:project, theme_brandable {{/str}}</dt><dd>{{project}}</dd>
+            <dt>{{#str}} account:environment, theme_brandable {{/str}}</dt><dd>{{environment}}</dd>
+            <dt>{{#str}} account:plan, theme_brandable {{/str}}</dt><dd data-region="accountplan">{{plan}}{{#updating}} <span class="tbe-badge" data-region="accountupdating">{{#str}} account:updating, theme_brandable {{/str}}</span>{{/updating}}</dd>
+            <dt>{{#str}} account:credits, theme_brandable {{/str}}</dt><dd class="tbe-account-credits" data-region="accountcredits">{{credits}}</dd>
+        </dl>
+        <div class="tbe-hint">{{monthly}}</div>
+        {{#purchased}}<div class="tbe-hint">{{purchased}}</div>{{/purchased}}
+        {{#periodend}}<div class="tbe-hint">{{periodend}}</div>{{/periodend}}
+        <div class="tbe-hint">{{usage}}</div>
+        <div class="tbe-account-links">
+            {{#dashboardurl}}<a href="{{dashboardurl}}" target="_blank" rel="noopener">{{#str}} account:dashboard, theme_brandable {{/str}}</a>{{/dashboardurl}}
+            {{#licencesurl}}<a href="{{licencesurl}}" target="_blank" rel="noopener">{{#str}} account:licences, theme_brandable {{/str}}</a>{{/licencesurl}}
+            {{#billingportalurl}}<a href="{{billingportalurl}}" target="_blank" rel="noopener">{{#str}} account:billingportal, theme_brandable {{/str}}</a>{{/billingportalurl}}
+        </div>
+        {{#canmanage}}
+            {{> theme_brandable/editor_offers }}
+        {{/canmanage}}
+    {{/available}}
+    {{#canmanage}}
+        <div class="tbe-account-section">
+            {{#disconnecterror}}
+                <div class="tbe-error" role="alert">
+                    {{#str}} account:disconnectfailed, theme_brandable {{/str}} {{disconnecterror}}
+                    <div>{{#str}} account:revokefromdashboard, theme_brandable {{/str}}</div>
+                    <button type="button" class="btn btn-sm btn-danger mt-1" data-action="forget">{{#str}} account:forgetlocally, theme_brandable {{/str}}</button>
+                </div>
+            {{/disconnecterror}}
+            <button type="button" class="tbe-link tbe-danger" data-action="disconnect">{{#str}} account:disconnect, theme_brandable {{/str}}</button>
+        </div>
+    {{/canmanage}}
+</div>

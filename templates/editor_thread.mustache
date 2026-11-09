@@ -1,0 +1,124 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template theme_brandable/editor_thread
+
+    Chat thread of the editor, oldest first: one entry per revision (prompt, then summary) and one per failed
+    attempt (prompt, then error). Revisions that are not on the way to the draft (undone or abandoned) are dimmed
+    and can be restored. The steps of the generation (events per run) are folded under each entry. Consecutive
+    revisions abandoned after a failed verification are folded in a group.
+
+    The published version (number, date, note) and the previous one, which can be published again, come first.
+
+    Context variables required for this template:
+    * versions - [{number, note, author, timecreated, iscurrent}]; canrevert - Whether the previous one can be published
+    * exporturl - Export of the published version (administrators)
+    * importurl - Import of an exported theme (administrators)
+    * entries, hasentries - Thread of the session in progress
+    * entries - Entries (theme_brandable/editor_entry), oldest first, or groups of abandoned ones ({isgroup, count, items})
+    * hasentries - Whether there is at least one revision
+
+    Example context (json):
+    {
+        "versions": [{"number": 2, "note": "Dark navbar.", "author": "Admin User", "timecreated": 1791300000, "iscurrent": true,
+            "cloud": {"status": "synced", "number": 12, "synced": true, "pending": false, "stopped": false, "errormessage": "", "contacturl": ""}
+            },
+            {"number": 1, "note": "Rounded cards.", "author": "Admin User", "timecreated": 1791200000, "iscurrent": false}],
+        "canrevert": true,
+        "exporturl": "https://example.com/theme/brandable/export.php",
+        "importurl": "https://example.com/theme/brandable/import.php",
+        "hasentries": true,
+        "entries": [
+            {
+                "id": 3,
+                "prompt": "Make the navbar dark",
+                "summary": "Dark navbar with white links.",
+                "author": "Admin User",
+                "timecreated": 1791400000,
+                "changecount": 2,
+                "isdraft": true,
+                "ispublished": false,
+                "inactive": false,
+                "canrestore": false,
+                "isfailed": false,
+                "haschanges": true,
+                "changes": [
+                    {"id": 9, "type": "scss", "target": "post/navbar", "deleted": false, "scopelabel": "Whole site",
+                     "canrescope": true, "scopeoptions": [{"level": "page", "value": "bp-my-index", "label": "Page: bp-my-index"}]}
+                ],
+                "hassteps": true,
+                "runs": [{"label": "Generation", "events": [{"message": "Planning the changes", "isrejected": false}]}]
+            },
+            {
+                "isfailed": true,
+                "generationid": 7,
+                "prompt": "Make it pop",
+                "errormessage": "The AI service is unavailable.",
+                "timecreated": 1791400100,
+                "hassteps": false,
+                "runs": []
+            }
+        ]
+    }
+}}
+{{#versions}}
+    <div class="tbe-version{{^iscurrent}} tbe-version-previous{{/iscurrent}}" data-region="version" data-number="{{number}}">
+        <div class="tbe-version-title">
+            {{#iscurrent}}{{#str}} version:current, theme_brandable, {{number}} {{/str}}{{/iscurrent}}
+            {{^iscurrent}}{{#str}} version:previous, theme_brandable, {{number}} {{/str}}{{/iscurrent}}
+            <span class="tbe-hint">{{#userdate}} {{timecreated}}, {{#str}} strftimedatetimeshort, core_langconfig {{/str}} {{/userdate}}{{#author}} · {{author}}{{/author}}</span>
+        </div>
+        {{#note}}<div class="tbe-version-note">{{note}}</div>{{/note}}
+        {{#jsdownloadurl}}<a class="tbe-link" href="{{jsdownloadurl}}">{{#str}} jsdownload, theme_brandable {{/str}}</a>{{/jsdownloadurl}}
+        {{#cloud}}
+            {{#synced}}<div class="tbe-hint" data-region="cloudstatus">{{#str}} cloud:synced, theme_brandable, {{number}} {{/str}}</div>{{/synced}}
+            {{#pending}}<div class="tbe-hint" data-region="cloudstatus">{{#str}} cloud:pending, theme_brandable {{/str}}{{#errormessage}} · {{errormessage}}{{/errormessage}}</div>{{/pending}}
+            {{#stopped}}
+                <div class="tbe-error" data-region="cloudstatus" role="alert">{{errormessage}}
+                    {{#contacturl}}<a href="{{contacturl}}" target="_blank" rel="noopener">{{#str}} cloud:contactsupport, theme_brandable {{/str}}</a>{{/contacturl}}
+                </div>
+                <button type="button" class="tbe-link" data-action="cloudretry">{{#str}} cloud:retry, theme_brandable {{/str}}</button>
+            {{/stopped}}
+        {{/cloud}}
+        {{#iscurrent}}{{#exporturl}}
+            <a class="tbe-link" href="{{exporturl}}">{{#str}} export:fromeditor, theme_brandable {{/str}}</a>
+        {{/exporturl}}{{#importurl}}
+            <a class="tbe-link" href="{{importurl}}">{{#str}} import:fromeditor, theme_brandable {{/str}}</a>
+        {{/importurl}}{{/iscurrent}}
+        {{^iscurrent}}{{#canrevert}}
+            <button type="button" class="tbe-link" data-action="revert">{{#str}} version:revert, theme_brandable {{/str}}</button>
+        {{/canrevert}}{{/iscurrent}}
+    </div>
+{{/versions}}
+{{#hasentries}}
+    {{#entries}}
+        {{#isgroup}}
+            <details class="tbe-abandoned">
+                <summary>{{#str}} abandonedattempts, theme_brandable, {{count}} {{/str}}</summary>
+                {{#items}}
+                    {{> theme_brandable/editor_entry}}
+                {{/items}}
+            </details>
+        {{/isgroup}}
+        {{^isgroup}}
+            {{> theme_brandable/editor_entry}}
+        {{/isgroup}}
+    {{/entries}}
+{{/hasentries}}
+{{^hasentries}}
+    <div class="tbe-empty">{{#str}} emptythread, theme_brandable {{/str}}</div>
+{{/hasentries}}
