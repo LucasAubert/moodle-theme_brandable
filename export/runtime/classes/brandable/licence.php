@@ -20,7 +20,7 @@ namespace theme_brandablert\brandable;
  * Brandable licence of the theme (licence-contract.md): Ed25519 token checked locally, refreshed by the daily signal,
  * or offline licence pasted by the administrator. Never changes the rendering: only administrators are told.
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

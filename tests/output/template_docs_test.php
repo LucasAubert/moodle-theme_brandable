@@ -16,6 +16,7 @@
 
 namespace theme_brandable\output;
 
+#[\PHPUnit\Framework\Attributes\CoversNothing]
 /**
  * Tests for the documentation of the templates: the example context of each one is valid JSON, ending where the
  * comment ends (a "}}" inside the example would close the comment early and show the rest in the page).
@@ -26,7 +27,6 @@ namespace theme_brandable\output;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
  */
-#[\PHPUnit\Framework\Attributes\CoversNothing]
 final class template_docs_test extends \basic_testcase {
     public function test_example_contexts_are_json(): void {
         $files = glob(__DIR__ . '/../../templates/*.mustache');

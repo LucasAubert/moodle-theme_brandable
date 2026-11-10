@@ -24,6 +24,10 @@ use theme_brandable\local\overrides\revision_manager;
 use theme_brandablert\brandable\js as runtime_js;
 use theme_brandablert\brandable\manifest as runtime_manifest;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(exporter::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(importer::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(revision_manager::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(review::class)]
 /**
  * Tests for the generated JavaScript in the exported themes (spec B15): files of the modules as delivered, the library b,
  * the manifest; the runtime of the theme (choice of the modules, settings); the import, as a draft whose modules are
@@ -38,10 +42,6 @@ use theme_brandablert\brandable\manifest as runtime_manifest;
  * @covers     \theme_brandable\local\overrides\revision_manager
  * @covers     \theme_brandable\local\js\review
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(exporter::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(importer::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(revision_manager::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(review::class)]
 final class js_export_test extends \advanced_testcase {
     /** @var string Source of the module of the test. */
     private const SOURCE = "export default function (b) {\n  b.once('welcome');\n}\n";

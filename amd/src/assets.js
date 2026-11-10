@@ -436,11 +436,11 @@ const handleClick = (e) => {
             region('imagefiles').click();
             return true;
         case 'attachasset':
-            attach(findAsset(id)).then(renderPanel);
+            attach(findAsset(id)).then(renderPanel).catch(Notification.exception);
             return true;
         case 'detachasset':
             attachments = attachments.filter((item) => item.id !== id);
-            renderAttachments().then(() => !region('assets').hidden && renderPanel());
+            renderAttachments().then(() => !region('assets').hidden && renderPanel()).catch(Notification.exception);
             return true;
         case 'editasset':
             editing = editing === id ? 0 : id;

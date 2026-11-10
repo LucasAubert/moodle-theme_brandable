@@ -16,6 +16,7 @@
 
 namespace theme_brandable\local;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(page_key::class)]
 /**
  * Tests for the Brandable page key (bp-*).
  *
@@ -25,7 +26,6 @@ namespace theme_brandable\local;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \theme_brandable\local\page_key
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(page_key::class)]
 final class page_key_test extends \advanced_testcase {
     /**
      * Creates empty files in a fresh directory.

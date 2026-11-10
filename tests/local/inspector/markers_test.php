@@ -20,6 +20,9 @@ use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\revision_manager;
 use theme_brandable\local\preview;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(markers::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\output\mustache\recording_template::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\output\mustache\loader::class)]
 /**
  * Tests for the template markers of the preview.
  *
@@ -31,9 +34,6 @@ use theme_brandable\local\preview;
  * @covers     \theme_brandable\output\mustache\recording_template
  * @covers     \theme_brandable\output\mustache\loader
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(markers::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\output\mustache\recording_template::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\output\mustache\loader::class)]
 final class markers_test extends \advanced_testcase {
     #[\Override]
     protected function setUp(): void {

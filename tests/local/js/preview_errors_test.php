@@ -25,6 +25,9 @@ use theme_brandable\local\generator\sync_generator;
 use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\resolver;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(generation_manager::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(report_verification::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(editor_state::class)]
 /**
  * Tests for the errors of the JavaScript modules in the preview (spec B11, contract 12.8) and their display in the
  * thread (B12): sent to the repair once per module and per generation, only for the modules of the revision.
@@ -37,9 +40,6 @@ use theme_brandable\local\overrides\resolver;
  * @covers     \theme_brandable\external\report_verification
  * @covers     \theme_brandable\external\editor_state
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(generation_manager::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(report_verification::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(editor_state::class)]
 final class preview_errors_test extends \advanced_testcase {
     #[\Override]
     protected function setUp(): void {

@@ -24,6 +24,8 @@ use theme_brandable\local\overrides\revision_manager;
 use theme_brandablert\brandable\assets as runtime_assets;
 use theme_brandablert\brandable\manifest as runtime_manifest;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(exporter::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(importer::class)]
 /**
  * Tests for the images and fonts of an exported theme, and their import (spec A13, A14; contract 11.6).
  *
@@ -34,8 +36,6 @@ use theme_brandablert\brandable\manifest as runtime_manifest;
  * @covers     \theme_brandable\local\export\exporter
  * @covers     \theme_brandable\local\export\importer
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(exporter::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(importer::class)]
 final class assets_export_test extends \advanced_testcase {
     #[\Override]
     public static function setUpBeforeClass(): void {

@@ -18,7 +18,7 @@
  * Serves the images and fonts of the version (brandable/assets/): asset.php/<hash>/<file>. Public and immutable;
  * see \theme_brandablert\brandable\assets::serve().
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

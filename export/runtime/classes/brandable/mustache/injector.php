@@ -28,7 +28,7 @@ use core\output\renderer_base;
  * If a future Moodle version drops the property, injection is disabled (degraded mode): the variants no longer
  * apply, the templates of the whole site (files of the theme) still do.
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

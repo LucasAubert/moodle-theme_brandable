@@ -16,6 +16,7 @@
 
 namespace theme_brandable;
 
+#[\PHPUnit\Framework\Attributes\CoversNothing]
 /**
  * Upgrade steps: none before 0.1.0, the first version published.
  *
@@ -25,7 +26,6 @@ namespace theme_brandable;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
  */
-#[\PHPUnit\Framework\Attributes\CoversNothing]
 final class upgrade_test extends \advanced_testcase {
     #[\Override]
     public static function setUpBeforeClass(): void {

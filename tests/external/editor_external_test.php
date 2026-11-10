@@ -20,6 +20,15 @@ use core_external\external_api;
 use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\revision_manager;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(editor_state::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(get_revisions::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(undo::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(redo::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(restore::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(publish::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(discard::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(revert_version::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(propose_version_note::class)]
 /**
  * Tests for the editor external functions.
  *
@@ -37,15 +46,6 @@ use theme_brandable\local\overrides\revision_manager;
  * @covers     \theme_brandable\external\revert_version
  * @covers     \theme_brandable\external\propose_version_note
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(editor_state::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(get_revisions::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(undo::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(redo::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(restore::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(publish::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(discard::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(revert_version::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(propose_version_note::class)]
 final class editor_external_test extends \advanced_testcase {
     #[\Override]
     protected function setUp(): void {

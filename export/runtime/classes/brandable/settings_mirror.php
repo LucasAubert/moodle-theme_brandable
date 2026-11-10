@@ -21,7 +21,7 @@ namespace theme_brandablert\brandable;
  * settings of the parent (brand colour, preset, logo...) are copied into this theme's config. Edited on the settings
  * page of the parent; copied at the installation, on every change (event) and by an hourly task.
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

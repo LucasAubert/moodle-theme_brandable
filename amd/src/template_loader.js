@@ -147,8 +147,7 @@ class BrandableLoader extends Loader {
                     installed.add(searchKey);
                     // Directly into the cache: partialHelper() reads it synchronously.
                     this.templateCache.set(searchKey, wrap(templateName, source));
-                    deferred.resolve(wrap(templateName, source));
-                    return source;
+                    return wrap(templateName, source);
                 })
                 .catch(() => {
                     // Never break the page: fall back on core's template. Our pending promise must be forgotten
@@ -157,8 +156,10 @@ class BrandableLoader extends Loader {
                     if (this.templatePromises[searchKey] === deferred.promise()) {
                         delete this.templatePromises[searchKey];
                     }
-                    super.getTemplate(templateName, themeName).then(deferred.resolve, deferred.reject);
-                });
+                    return super.getTemplate(templateName, themeName);
+                })
+                .then(deferred.resolve)
+                .catch(deferred.reject);
         }
         // Core may have cached a promise of the original (prefetch): ours takes precedence.
         this.templatePromises[searchKey] = promises.get(searchKey);
@@ -206,7 +207,7 @@ export const init = () => {
     if (!data || (!templates.length && !data.markers) || overrides !== null) {
         return;
     }
-    overrides = {revision: Number(data.revision), assets: Number(data.assets || 0), public: !!data.public,
+    overrides = {revision: Number(data.revision), assets: Number(data.assets || 0), 'public': !!data.public,
         hashes: new Map(templates), markers: !!data.markers};
     Renderer.setLoader(BrandableLoader);
 };

@@ -18,6 +18,7 @@ namespace theme_brandable\local\cloud;
 
 use theme_brandable\local\account\api_client;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(proposals::class)]
 /**
  * Tests for the proposals of a version to another environment (contract 13.7, spec C15, C16).
  *
@@ -27,7 +28,6 @@ use theme_brandable\local\account\api_client;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \theme_brandable\local\cloud\proposals
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(proposals::class)]
 final class proposals_test extends \advanced_testcase {
     /**
      * A client recording the requests and answering with the same answer.

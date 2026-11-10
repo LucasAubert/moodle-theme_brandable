@@ -22,6 +22,7 @@ use theme_brandable\local\overrides\revision_manager;
 use theme_brandable\local\overrides\template_source;
 use theme_brandable\local\parent_theme;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(generation_context::class)]
 /**
  * Tests for the generation context (request body of the backend contract v2).
  *
@@ -31,7 +32,6 @@ use theme_brandable\local\parent_theme;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \theme_brandable\local\generator\generation_context
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(generation_context::class)]
 final class generation_context_test extends \advanced_testcase {
     use \theme_brandable\tests\requires_classic;
 

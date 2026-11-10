@@ -33,17 +33,30 @@ class generator_exception extends \moodle_exception {
     /** @var string Page where the administrator can act (recharge, plan), empty if none. */
     public readonly string $url;
 
+    /** @var int Seconds to wait before trying again (Retry-After of Brandable), 0 if not said. */
+    public readonly int $retryafter;
+
+    /**
+     * @var bool Brandable itself is unavailable (503, overloaded, not reached: contract 7), not the generation: the
+     * request is kept and asked again after the Retry-After.
+     */
+    public readonly bool $unavailable;
+
     /**
      * Constructor.
      *
      * @param string $code Error code.
      * @param string $message Message shown to the administrator.
      * @param string $url Page where the administrator can act, empty if none.
+     * @param int $retryafter Seconds to wait before trying again, 0 if not said.
+     * @param bool $unavailable Whether Brandable itself is unavailable (not the generation).
      */
-    public function __construct(string $code, string $message, string $url = '') {
+    public function __construct(string $code, string $message, string $url = '', int $retryafter = 0, bool $unavailable = false) {
         $this->generatorcode = $code;
         $this->displaymessage = $message;
         $this->url = $url;
+        $this->retryafter = $retryafter;
+        $this->unavailable = $unavailable;
         parent::__construct('error:generator', 'theme_brandable', '', $message);
     }
 }

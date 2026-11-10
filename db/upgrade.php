@@ -32,7 +32,9 @@
  * @return bool
  */
 function xmldb_theme_brandable_upgrade($oldversion) {
-    if ($oldversion < 2026110505) {
+    // Not an upgrade step (no savepoint): the alpha versions are refused.
+    $firstrelease = 2026110505;
+    if ($oldversion < $firstrelease) {
         throw new moodle_exception('upgradefromalpha', 'theme_brandable', '', $oldversion);
     }
 

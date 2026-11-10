@@ -43,14 +43,15 @@ class parent_theme {
     /**
      * Theme properties copied from the parent config because core only reads them from the theme itself.
      *
-     * Properties that core already resolves through the parent configs (sheets, editor_sheets, javascripts,
-     * scss, prescsscallback, extrascsscallback, precompiledcsscallback, iconsystem, parents_exclude_*,
-     * pix and fonts) are deliberately NOT copied: their callbacks would otherwise run twice.
+     * Properties that core already resolves through the parent configs (sheets, editor_sheets, editor_scss,
+     * javascripts, scss, prescsscallback, extrascsscallback, precompiledcsscallback, iconsystem, parents_exclude_*,
+     * pix and fonts) are deliberately NOT copied: their callbacks would otherwise run twice, and editor_scss copied
+     * would be looked for in the directory of Brandable (theme_config::editor_scss_to_css()).
      */
     public const COPIED_PROPERTIES = [
         'usefallback', 'enablecourseajax', 'requiredblocks', 'haseditswitch', 'usescourseindex',
         'activityheaderconfig', 'removedprimarynavitems', 'addblockposition', 'blockrendermethod',
-        'editor_scss', 'csspostprocess', 'csstreepostprocessor', 'doctype', 'yuicssmodules',
+        'csspostprocess', 'csstreepostprocessor', 'doctype', 'yuicssmodules',
         'rarrow', 'larrow', 'uarrow', 'darrow',
     ];
 

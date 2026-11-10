@@ -24,6 +24,7 @@ use core_privacy\tests\provider_testcase;
 use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\revision_manager;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(provider::class)]
 /**
  * Tests for the privacy provider (revisions are anonymised, never deleted).
  *
@@ -33,7 +34,6 @@ use theme_brandable\local\overrides\revision_manager;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \theme_brandable\privacy\provider
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(provider::class)]
 final class provider_test extends provider_testcase {
     /** @var \stdClass First author. */
     private \stdClass $user1;

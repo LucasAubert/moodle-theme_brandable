@@ -85,7 +85,10 @@ class remote_generator implements generator_interface {
         try {
             return $this->client->request($method, $path, $body);
         } catch (api_exception $e) {
-            throw new generator_exception($e->apicode, $e->displaymessage, $e->url);
+            // Brandable itself unavailable (contract 7): the generation is asked again after the Retry-After.
+            $unavailable = in_array($e->apicode, ['service_unavailable', 'rate_limited'], true)
+                || in_array($e->httpstatus, [502, 503, 504], true);
+            throw new generator_exception($e->apicode, $e->displaymessage, $e->url, $e->retry_after(), $unavailable);
         }
     }
 }

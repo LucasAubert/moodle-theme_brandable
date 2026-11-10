@@ -23,16 +23,16 @@ use stdClass;
  * Parent theme of the exported theme (fixed at the export): theme chain, layouts and the properties core only reads
  * from the theme itself. Same resolution as theme_brandable on Moodle 4.5 and 5.1.
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class parent_config {
-    /** @var string[] Theme properties copied from the parent chain (not inherited by core). */
+    /** @var string[] Theme properties copied from the parent chain (not inherited by core; editor_scss is). */
     public const COPIED_PROPERTIES = [
         'usefallback', 'enablecourseajax', 'requiredblocks', 'haseditswitch', 'usescourseindex',
         'activityheaderconfig', 'removedprimarynavitems', 'addblockposition', 'blockrendermethod',
-        'editor_scss', 'csspostprocess', 'csstreepostprocessor', 'doctype', 'yuicssmodules',
+        'csspostprocess', 'csstreepostprocessor', 'doctype', 'yuicssmodules',
         'rarrow', 'larrow', 'uarrow', 'darrow',
     ];
 

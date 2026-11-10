@@ -16,6 +16,7 @@
 
 namespace theme_brandable\local;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(parent_theme::class)]
 /**
  * Tests for the dynamic parent theme resolution.
  *
@@ -25,7 +26,6 @@ namespace theme_brandable\local;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \theme_brandable\local\parent_theme
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(parent_theme::class)]
 final class parent_theme_test extends \advanced_testcase {
     use \theme_brandable\tests\requires_classic;
 
@@ -110,6 +110,15 @@ final class parent_theme_test extends \advanced_testcase {
         $this->assertSame(['boost'], $theme->parents);
         $this->assertSame('drawers.php', $theme->layouts['standard']['file']);
         $this->assertTrue($theme->haseditswitch);
+        // Resolved by core through the parents: copied, it would be looked for in theme/brandable/scss.
+        $this->assertObjectNotHasProperty('editor_scss', $theme);
+    }
+
+    public function test_editor_scss_comes_from_the_parent(): void {
+        $this->set_parent('boost');
+        $css = \theme_config::load('brandable')->editor_scss_to_css();
+        $this->assertDebuggingNotCalled();
+        $this->assertNotSame('', $css);
     }
 
     public function test_theme_config_load_follows_parent(): void {

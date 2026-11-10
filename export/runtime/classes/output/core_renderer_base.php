@@ -18,7 +18,7 @@
  * Dynamic base class of the core renderer of the theme: aliased to the core renderer of the parent chain (the first
  * theme of the chain that has one, else core), so that the core renderer of the theme extends it.
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

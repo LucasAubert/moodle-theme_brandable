@@ -19,7 +19,7 @@ namespace theme_brandablert\task;
 /**
  * Copies the parent settings changed without event (set_config() called directly).
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

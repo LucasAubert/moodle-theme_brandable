@@ -22,7 +22,7 @@ use theme_brandablert\brandable\variants;
  * Mustache loader: the variant of a template that applies to the page, otherwise the standard filesystem resolution
  * (templates of this theme, of its parents, then of the component).
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

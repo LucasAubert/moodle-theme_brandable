@@ -21,6 +21,10 @@ use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\revision_manager;
 use theme_brandable\local\overrides\template_source;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(exporter::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(export_manager::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(licence::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(theme_name::class)]
 /**
  * Tests for the export of the published version as a standalone theme.
  *
@@ -33,10 +37,6 @@ use theme_brandable\local\overrides\template_source;
  * @covers     \theme_brandable\local\export\licence
  * @covers     \theme_brandable\local\export\theme_name
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(exporter::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(export_manager::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(licence::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(theme_name::class)]
 final class exporter_test extends \advanced_testcase {
     use \theme_brandable\tests\requires_classic;
 
@@ -116,8 +116,11 @@ final class exporter_test extends \advanced_testcase {
             if (str_ends_with($file->getFilename(), '.php')) {
                 token_get_all($content, TOKEN_PARSE);
                 $this->assertStringStartsWith("<?php\n// This file is part of Moodle", $content, $file->getPathname());
+                // The PHPDoc names the exported theme, not Brandable where the runtime lives.
+                $this->assertDoesNotMatchRegularExpression('/@package\s+theme_brandable$/m', $content, $file->getPathname());
             }
         }
+        $this->assertStringContainsString('@package    theme_acme' . "\n", file_get_contents("$dir/lib.php"));
         $plugin = new \stdClass();
         include("$dir/version.php");
         $this->assertSame('theme_acme', $plugin->component);

@@ -20,6 +20,10 @@ use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\resolver;
 use theme_brandable\local\overrides\revision_manager;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(generation_manager::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(generation_context::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(generation_result::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(mock_generator::class)]
 /**
  * Tests for the questions of the generator (needsClarification) and their answers.
  *
@@ -32,10 +36,6 @@ use theme_brandable\local\overrides\revision_manager;
  * @covers     \theme_brandable\local\generator\generation_result
  * @covers     \theme_brandable\local\generator\mock_generator
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(generation_manager::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(generation_context::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(generation_result::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(mock_generator::class)]
 final class question_test extends \advanced_testcase {
     #[\Override]
     protected function setUp(): void {

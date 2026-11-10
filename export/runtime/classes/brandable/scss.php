@@ -20,7 +20,7 @@ namespace theme_brandablert\brandable;
  * SCSS of the exported version: the chunks of a section (pre or post), in order, scoped chunks wrapped in their
  * body selector (inside, & is the body itself).
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

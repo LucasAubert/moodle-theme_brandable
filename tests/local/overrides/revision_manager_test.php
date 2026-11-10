@@ -16,6 +16,11 @@
 
 namespace theme_brandable\local\overrides;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(revision_manager::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(resolver::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(context::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(migration::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(version_note::class)]
 /**
  * Tests for the revision chain resolution and the draft / published / redo pointers.
  *
@@ -29,11 +34,6 @@ namespace theme_brandable\local\overrides;
  * @covers     \theme_brandable\local\overrides\migration
  * @covers     \theme_brandable\local\overrides\version_note
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(revision_manager::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(resolver::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(context::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(migration::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(version_note::class)]
 final class revision_manager_test extends \advanced_testcase {
     #[\Override]
     protected function setUp(): void {

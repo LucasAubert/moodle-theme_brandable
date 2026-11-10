@@ -22,6 +22,7 @@ use theme_brandable\local\validation\scss_compiler;
 use theme_brandable\local\validation\validation_exception;
 use theme_brandable\local\validation\validator;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(colour_modes::class)]
 /**
  * Tests of the colour modes: the brandable-dark mixin on every version, its rules, the state of the modes.
  *
@@ -31,7 +32,6 @@ use theme_brandable\local\validation\validator;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \theme_brandable\local\colour_modes
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(colour_modes::class)]
 final class colour_modes_test extends \advanced_testcase {
     #[\Override]
     protected function setUp(): void {

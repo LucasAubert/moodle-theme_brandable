@@ -21,7 +21,7 @@ use theme_brandablert\brandable\licence;
 /**
  * Daily signal tried again after a failure: 1 h, 4 h, then 12 h later at most (or after Retry-After).
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

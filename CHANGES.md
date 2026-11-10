@@ -3,6 +3,41 @@
 One section per release, newest first: `## <release> (<version>) - <date>`, then the notes in English (required),
 then in French. Brandable reads these notes when it publishes a release.
 
+## 0.3.0 (2026111000) - 2026-11-10
+
+### English
+
+- Beta, and the first version for Moodle Marketplace.
+- Before connecting, the site shows what Brandable receives, with its terms and privacy policy.
+- When Brandable is unavailable, the editor shows its message and keeps your request: a generation in progress
+  resumes when Brandable is back, and a prompt sent meanwhile is sent again automatically (or with "Try again").
+- New versions in beta are announced by the plugin, since Moodle only announces stable versions by default.
+- The list of the images of the library is declared to the privacy API.
+- Upgrading from a development version older than 0.1.0 is refused with a clear message (uninstall, then install).
+- Fixed: on Moodle 5.3, a theme child of Boost no longer looks for an editor stylesheet of its own (warning at the
+  installation); exported themes carry the runtime 1.3.1 and their own component name in every file.
+- Fixed: the steps of a generation are listed in their order, whatever the format of their time.
+- The preview banner takes its styles from a stylesheet, no longer from an inline style.
+- Tested on Moodle 4.5 to 5.3, PHP 8.2 to 8.4 (PHP 8.1: static compatibility check), PostgreSQL, MariaDB and MySQL.
+- Public documentation, README and Behat tests.
+
+### Français
+
+- Version bêta, et première version pour Moodle Marketplace.
+- Avant la connexion, le site indique ce que Brandable reçoit, avec ses conditions et sa politique de confidentialité.
+- Quand Brandable est indisponible, l'éditeur affiche son message et garde votre demande : une génération en cours
+  reprend au retour de Brandable, et un prompt envoyé entre-temps est renvoyé automatiquement (ou avec « Réessayer »).
+- Les nouvelles versions bêta sont annoncées par le plugin, Moodle n'annonçant par défaut que les versions stables.
+- La liste des images de la bibliothèque est déclarée à la Privacy API.
+- Une mise à jour depuis une version de développement antérieure à la 0.1.0 est refusée avec un message clair
+  (désinstaller, puis installer).
+- Corrigé : sur Moodle 5.3, un thème enfant de Boost ne cherche plus de feuille de style d'éditeur à lui (avertissement
+  à l'installation) ; les thèmes exportés embarquent le runtime 1.3.1 et leur propre nom de composant dans chaque fichier.
+- Corrigé : les étapes d'une génération sont listées dans leur ordre, quel que soit le format de leur heure.
+- Le bandeau d'aperçu prend ses styles d'une feuille de style, et non plus d'un style en ligne.
+- Testé sur Moodle 4.5 à 5.3, PHP 8.2 à 8.4 (PHP 8.1 : contrôle statique de compatibilité), PostgreSQL, MariaDB et MySQL.
+- Documentation publique, README et tests Behat.
+
 ## 0.2.0 (2026110601) - 2026-11-09
 
 ### English

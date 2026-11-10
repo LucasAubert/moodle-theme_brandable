@@ -63,7 +63,11 @@ const tokenize = (code) => {
         } else if (match[3] !== undefined) {
             kind = 'number';
         } else if (match[4] !== undefined) {
-            kind = KEYWORDS.has(match[4]) ? 'keyword' : (match[4] === 'b' ? 'api' : '');
+            if (KEYWORDS.has(match[4])) {
+                kind = 'keyword';
+            } else if (match[4] === 'b') {
+                kind = 'api';
+            }
         }
         // A token over several lines (comment, template literal) is cut at each line.
         match[0].split('\n').forEach((text, index) => {

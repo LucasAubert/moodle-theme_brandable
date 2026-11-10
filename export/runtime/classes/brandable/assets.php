@@ -24,7 +24,7 @@ namespace theme_brandablert\brandable;
  * The markers of the templates were replaced at the export (root of the site, /theme/<name>/asset.php/...): templates
  * of the whole site are standard files, read by core for the rendering in JavaScript too.
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

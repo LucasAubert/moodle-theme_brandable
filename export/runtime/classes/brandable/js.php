@@ -24,7 +24,7 @@ namespace theme_brandablert\brandable;
  * Settings of the theme: brandable_js (on at the export when it was on the site of Brandable), brandable_jssuspended
  * (kill switch); ?brandable_nojs=1 turns them off on a page, for the administrators.
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

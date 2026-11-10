@@ -403,6 +403,9 @@ class exporter {
             }
             $relative = str_replace(theme_name::RUNTIME_TOKEN, $this->name, $relative);
             $content = str_replace(theme_name::RUNTIME_TOKEN, $this->name, file_get_contents($file->getPathname()));
+            // The PHPDoc of the runtime names the plugin where it lives (theme_brandable, checked by moodle-cs):
+            // it becomes the exported theme.
+            $content = preg_replace('/^(\s*\*\s*@package\s+)theme_brandable$/m', '${1}theme_' . $this->name, $content);
             $files[$this->name . '/' . $relative] = [$content];
         }
         return $files;

@@ -21,6 +21,7 @@ use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\revision_manager;
 use theme_brandable\local\preview;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(get_template_overrides::class)]
 /**
  * Tests for the templates rendered in JavaScript: overrides service and page initialisation.
  *
@@ -30,7 +31,6 @@ use theme_brandable\local\preview;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \theme_brandable\external\get_template_overrides
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(get_template_overrides::class)]
 final class template_overrides_test extends \advanced_testcase {
     #[\Override]
     public static function setUpBeforeClass(): void {

@@ -31,8 +31,8 @@ const TIMEOUT = 120000;
 /**
  * Calls an external function of theme_brandable.
  *
- * Failures are rejected with {call, error}: the name of the function and what core/ajax rejected with (an
- * exception {message, errorcode}, a request error {error, errorcode}, or the jQuery error text for network
+ * Failures are rejected with an Error carrying {call, error}: the name of the function and what core/ajax rejected
+ * with (an exception {message, errorcode}, a request error {error, errorcode}, or the jQuery error text for network
  * failures and timeouts).
  *
  * @param {String} name Function name without the theme_brandable_ prefix.
@@ -43,7 +43,11 @@ const call = (name, args = {}) => {
     const methodname = `theme_brandable_${name}`;
     return Promise.resolve(Ajax.call([{methodname, args}], true, true, false, TIMEOUT)[0])
         .catch((error) => {
-            throw {call: methodname, error};
+            // An Error carrying the call and its error (describeError() in editor.js).
+            const failure = new Error(methodname);
+            failure.call = methodname;
+            failure.error = error;
+            throw failure;
         });
 };
 

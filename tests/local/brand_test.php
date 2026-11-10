@@ -16,6 +16,7 @@
 
 namespace theme_brandable\local;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(brand::class)]
 /**
  * Tests of the styles of the pages of the plugin (spec docs/SPEC-brand-editor.md): scope, colours, loading.
  *
@@ -25,7 +26,6 @@ namespace theme_brandable\local;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \theme_brandable\local\brand
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(brand::class)]
 final class brand_test extends \advanced_testcase {
     /** @var string Pattern of a colour literal. */
     private const COLOUR = '~#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?)\(~';

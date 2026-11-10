@@ -26,6 +26,9 @@ use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\resolver;
 use theme_brandable\local\overrides\revision_manager;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(request::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(font_downloader::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(generation_manager::class)]
 /**
  * Tests for the library in the generation requests and the fonts of the catalogue (spec A11, A12; contract 11.2,
  * 11.6).
@@ -38,9 +41,6 @@ use theme_brandable\local\overrides\revision_manager;
  * @covers     \theme_brandable\local\assets\font_downloader
  * @covers     \theme_brandable\local\generator\generation_manager
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(request::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(font_downloader::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(generation_manager::class)]
 final class fonts_test extends \advanced_testcase {
     /** @var string Public URL of the Brandable API. */
     private const API = 'https://app.brandablelms.com/api/v1';

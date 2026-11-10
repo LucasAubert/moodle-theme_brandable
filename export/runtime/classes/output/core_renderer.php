@@ -22,7 +22,7 @@ use theme_brandablert\brandable\assets;
  * Core renderer of the theme: logo, compact logo and favicon of the version (images of the theme), without changing
  * the settings of the site. Everything else is the renderer of the parent chain.
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

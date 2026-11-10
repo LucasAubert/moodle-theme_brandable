@@ -18,6 +18,7 @@ namespace theme_brandable\local\export;
 
 use theme_brandablert\brandable\licence as runtime_licence;
 
+#[\PHPUnit\Framework\Attributes\CoversNothing]
 /**
  * Tests for the licence of the exported themes (static runtime, licence-contract.md), run on the runtime sources:
  * tokens signed with a key pair of the test, and the test vector of the contract.
@@ -28,7 +29,6 @@ use theme_brandablert\brandable\licence as runtime_licence;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
  */
-#[\PHPUnit\Framework\Attributes\CoversNothing]
 final class runtime_licence_test extends \advanced_testcase {
     /** @var string Secret key of the test. */
     private string $secret;

@@ -17,7 +17,7 @@
 /**
  * Settings of theme_brandablert: the Brandable licence (the design follows the settings of the parent theme).
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

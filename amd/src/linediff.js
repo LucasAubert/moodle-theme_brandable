@@ -26,6 +26,9 @@
 /** @var {Number} Largest table of the longest common subsequence (lines of the middle before × after). */
 const MAX_TABLE = 4000000;
 
+/** @type {Object<String, String>} Class of a line by its op. */
+const LINE_CLASSES = {'+': ' is-added', '-': ' is-removed'};
+
 /**
  * Returns the line diff of two sources (longest common subsequence of the lines between the common start and end;
  * when the middle is too large, it is shown removed then added).
@@ -37,6 +40,21 @@ const MAX_TABLE = 4000000;
 export const diff = (before, after) => {
     const a = before === '' ? [] : before.split('\n');
     const b = after === '' ? [] : after.split('\n');
+    const [start, end] = commonEnds(a, b);
+    const lines = a.slice(0, start).map((text) => ({op: ' ', text}));
+    lines.push(...diffMiddle(a.slice(start, a.length - end), b.slice(start, b.length - end)));
+    lines.push(...a.slice(a.length - end).map((text) => ({op: ' ', text})));
+    return lines;
+};
+
+/**
+ * Returns the number of lines common to the start, and to the end, of two sources.
+ *
+ * @param {String[]} a Lines before.
+ * @param {String[]} b Lines after.
+ * @returns {Number[]} [start, end].
+ */
+const commonEnds = (a, b) => {
     let start = 0;
     while (start < a.length && start < b.length && a[start] === b[start]) {
         start++;
@@ -45,9 +63,18 @@ export const diff = (before, after) => {
     while (end < a.length - start && end < b.length - start && a[a.length - 1 - end] === b[b.length - 1 - end]) {
         end++;
     }
-    const lines = a.slice(0, start).map((text) => ({op: ' ', text}));
-    const middleA = a.slice(start, a.length - end);
-    const middleB = b.slice(start, b.length - end);
+    return [start, end];
+};
+
+/**
+ * Returns the line diff of the middles of two sources (between their common start and end).
+ *
+ * @param {String[]} middleA Lines before.
+ * @param {String[]} middleB Lines after.
+ * @returns {Array<{op: String, text: String}>}
+ */
+const diffMiddle = (middleA, middleB) => {
+    const lines = [];
     if (middleA.length * middleB.length > MAX_TABLE) {
         lines.push(...middleA.map((text) => ({op: '-', text})), ...middleB.map((text) => ({op: '+', text})));
     } else {
@@ -75,7 +102,6 @@ export const diff = (before, after) => {
             }
         }
     }
-    lines.push(...a.slice(a.length - end).map((text) => ({op: ' ', text})));
     return lines;
 };
 
@@ -91,7 +117,7 @@ export const renderDiff = (before, after) => {
     pre.className = 'tbe-code tbe-diff';
     diff(before, after).forEach(({op, text}) => {
         const line = document.createElement('span');
-        line.className = 'tbe-diff-line' + (op === '+' ? ' is-added' : (op === '-' ? ' is-removed' : ''));
+        line.className = 'tbe-diff-line' + (LINE_CLASSES[op] || '');
         line.textContent = `${op} ${text}`;
         pre.append(line);
     });

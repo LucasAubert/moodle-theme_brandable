@@ -105,10 +105,7 @@ class api_client {
             throw new api_exception('url_blocked', get_string('error:urlblocked', 'theme_brandable', $origin));
         }
         if ($curl->get_errno() || $curl->error) {
-            throw new api_exception(
-                'connection_failed',
-                get_string('error:apiconnection', 'theme_brandable', $curl->error ?: (string) $curl->get_errno())
-            );
+            throw self::unavailable($curl->error ?: (string) $curl->get_errno(), 0);
         }
         $status = (int) ($curl->get_info()['http_code'] ?? 0);
         // A route that can refuse an old plugin went through: the version required is no longer true (spec U2).
@@ -124,22 +121,7 @@ class api_client {
         // API errors are { error: { code, message, url? } } alone (a failed generation also has status and events).
         $apierror = is_array($data) && array_keys($data) === ['error'];
         if ($status >= 400 || !is_array($data) || $apierror) {
-            $error = is_array($data) ? ($data['error'] ?? null) : null;
-            if (is_array($error) && isset($error['code'], $error['message'])) {
-                $link = (string) ($error['url'] ?? '');
-                $exception = new api_exception(
-                    (string) $error['code'],
-                    (string) $error['message'],
-                    preg_match('~^https?://~i', $link) ? $link : '',
-                    $status,
-                    array_diff_key($error, array_flip(['code', 'message', 'url']))
-                );
-                if ($exception->apicode === plugin_updates::UPGRADE_REQUIRED) {
-                    plugin_updates::record_required($exception);
-                }
-                throw $exception;
-            }
-            throw new api_exception('http_' . $status, get_string('error:apistatus', 'theme_brandable', $status), '', $status);
+            throw self::error($curl, $data, $status);
         }
         if ($checked) {
             plugin_updates::clear_required();
@@ -170,34 +152,105 @@ class api_client {
         $raw = $curl->get($this->baseurl . $path, [], ['CURLOPT_TIMEOUT' => self::TIMEOUT, 'CURLOPT_CONNECTTIMEOUT' => 10,
             'CURLOPT_MAXFILESIZE' => $maxbytes]);
         if ($curl->get_errno() || $curl->error) {
-            throw new api_exception(
-                'connection_failed',
-                get_string('error:apiconnection', 'theme_brandable', $curl->error ?: (string) $curl->get_errno())
-            );
+            throw self::unavailable($curl->error ?: (string) $curl->get_errno(), 0);
         }
         $status = (int) ($curl->get_info()['http_code'] ?? 0);
         if ($status >= 400) {
-            $error = json_decode((string) $raw, true)['error'] ?? null;
-            if (is_array($error) && isset($error['code'], $error['message'])) {
-                $link = (string) ($error['url'] ?? '');
-                $exception = new api_exception(
-                    (string) $error['code'],
-                    (string) $error['message'],
-                    preg_match('~^https?://~i', $link) ? $link : '',
-                    $status,
-                    array_diff_key($error, array_flip(['code', 'message', 'url']))
-                );
-                if ($exception->apicode === plugin_updates::UPGRADE_REQUIRED) {
-                    plugin_updates::record_required($exception);
-                }
-                throw $exception;
-            }
-            throw new api_exception('http_' . $status, get_string('error:apistatus', 'theme_brandable', $status), '', $status);
+            throw self::error($curl, json_decode((string) $raw, true), $status);
         }
         if (strlen((string) $raw) > $maxbytes) {
             throw new api_exception('http_413', get_string('asset:error:filesize', 'theme_brandable', display_size($maxbytes)));
         }
         return (string) $raw;
+    }
+
+    /**
+     * The error of an answer: the error of the API ({ error: { code, message, url? } }, with the Retry-After of the
+     * answer), Brandable unavailable when the answer is not JSON (page of a proxy, cut), or the HTTP status.
+     *
+     * @param \curl $curl Request done.
+     * @param mixed $data Decoded body.
+     * @param int $status HTTP status.
+     * @return api_exception
+     */
+    private static function error(\curl $curl, $data, int $status): api_exception {
+        $retryafter = self::retry_after($curl);
+        $error = is_array($data) ? ($data['error'] ?? null) : null;
+        if (is_array($error) && isset($error['code'], $error['message'])) {
+            $link = (string) ($error['url'] ?? '');
+            $details = array_diff_key($error, array_flip(['code', 'message', 'url']));
+            if ($retryafter > 0) {
+                $details[api_exception::RETRY_AFTER] = $retryafter;
+            }
+            $exception = new api_exception(
+                (string) $error['code'],
+                (string) $error['message'],
+                preg_match('~^https?://~i', $link) ? $link : '',
+                $status,
+                $details
+            );
+            if ($exception->apicode === plugin_updates::UPGRADE_REQUIRED) {
+                plugin_updates::record_required($exception);
+            }
+            return $exception;
+        }
+        if (!is_array($data)) {
+            // Not JSON (HTML page, cut answer): as the 503 of Brandable, with a message of the plugin (contract 7).
+            return self::unavailable('HTTP ' . $status, $status, $retryafter);
+        }
+        return new api_exception('http_' . $status, get_string('error:apistatus', 'theme_brandable', $status), '', $status);
+    }
+
+    /**
+     * Brandable cannot be reached (network, timeout, answer that is not JSON): handled as its 503 service_unavailable
+     * (contract 7, "Brandable indisponible"), with a message of the plugin; the cause is kept in the details.
+     *
+     * @param string $cause Error of cURL or status.
+     * @param int $status HTTP status, 0 when nothing was received.
+     * @param int $retryafter Retry-After of the answer, 0 if none.
+     * @return api_exception
+     */
+    private static function unavailable(string $cause, int $status, int $retryafter = 0): api_exception {
+        return new api_exception(
+            'service_unavailable',
+            get_string('error:unavailable', 'theme_brandable'),
+            '',
+            $status,
+            [api_exception::RETRY_AFTER => $retryafter ?: api_exception::DEFAULT_RETRY_AFTER, 'cause' => $cause]
+        );
+    }
+
+    /**
+     * The Retry-After of an answer, in seconds (seconds or HTTP date), between 0 (none) and an hour.
+     *
+     * @param \curl $curl Request done.
+     * @return int
+     */
+    private static function retry_after(\curl $curl): int {
+        foreach ((array) $curl->getResponse() as $name => $value) {
+            if (strcasecmp(trim((string) $name), 'Retry-After') !== 0) {
+                continue;
+            }
+            return self::parse_retry_after((string) (is_array($value) ? end($value) : $value));
+        }
+        return 0;
+    }
+
+    /**
+     * Reads a Retry-After header: seconds or HTTP date, between 0 (none, invalid, past) and an hour.
+     *
+     * @param string $value Value of the header.
+     * @return int Seconds.
+     */
+    public static function parse_retry_after(string $value): int {
+        $value = trim($value);
+        if (ctype_digit($value)) {
+            $seconds = (int) $value;
+        } else {
+            $time = $value === '' ? false : strtotime($value);
+            $seconds = $time === false ? 0 : $time - time();
+        }
+        return max(0, min(HOURSECS, $seconds));
     }
 
     /**

@@ -19,6 +19,8 @@ namespace theme_brandable\local\assets;
 use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\revision_manager;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(library::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(server::class)]
 /**
  * Tests for the library of images and fonts (spec A1, A4, A5, A6).
  *
@@ -29,8 +31,6 @@ use theme_brandable\local\overrides\revision_manager;
  * @covers     \theme_brandable\local\assets\library
  * @covers     \theme_brandable\local\assets\server
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(library::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(server::class)]
 final class library_test extends \advanced_testcase {
     #[\Override]
     protected function setUp(): void {

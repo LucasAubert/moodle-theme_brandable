@@ -26,7 +26,7 @@ use core\output\renderer_base;
  * call of a renderer goes through the delegation. Every public method of Mustache_Engine is delegated
  * (checked by a unit test). The parent constructor is deliberately not called.
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -111,7 +111,7 @@ class lazy_engine extends \core\output\mustache_engine {
     /**
      * Delegates to the real engine.
      *
-     * @param mixed $loader See \Mustache_Engine::setLoader().
+     * @param \Mustache_Loader $loader See \Mustache_Engine::setLoader().
      * @return mixed
      */
     public function setLoader(\Mustache_Loader $loader) {
@@ -130,7 +130,7 @@ class lazy_engine extends \core\output\mustache_engine {
     /**
      * Delegates to the real engine.
      *
-     * @param mixed $partialsloader See \Mustache_Engine::setPartialsLoader().
+     * @param \Mustache_Loader $partialsloader See \Mustache_Engine::setPartialsLoader().
      * @return mixed
      */
     public function setPartialsLoader(\Mustache_Loader $partialsloader) {
@@ -149,7 +149,7 @@ class lazy_engine extends \core\output\mustache_engine {
     /**
      * Delegates to the real engine.
      *
-     * @param mixed $partials See \Mustache_Engine::setPartials().
+     * @param array $partials See \Mustache_Engine::setPartials().
      * @return mixed
      */
     public function setPartials(array $partials = []) {
@@ -238,7 +238,7 @@ class lazy_engine extends \core\output\mustache_engine {
     /**
      * Delegates to the real engine.
      *
-     * @param mixed $tokenizer See \Mustache_Engine::setTokenizer().
+     * @param \Mustache_Tokenizer $tokenizer See \Mustache_Engine::setTokenizer().
      * @return mixed
      */
     public function setTokenizer(\Mustache_Tokenizer $tokenizer) {
@@ -257,7 +257,7 @@ class lazy_engine extends \core\output\mustache_engine {
     /**
      * Delegates to the real engine.
      *
-     * @param mixed $parser See \Mustache_Engine::setParser().
+     * @param \Mustache_Parser $parser See \Mustache_Engine::setParser().
      * @return mixed
      */
     public function setParser(\Mustache_Parser $parser) {
@@ -276,7 +276,7 @@ class lazy_engine extends \core\output\mustache_engine {
     /**
      * Delegates to the real engine.
      *
-     * @param mixed $compiler See \Mustache_Engine::setCompiler().
+     * @param \Mustache_Compiler $compiler See \Mustache_Engine::setCompiler().
      * @return mixed
      */
     public function setCompiler(\Mustache_Compiler $compiler) {
@@ -295,7 +295,7 @@ class lazy_engine extends \core\output\mustache_engine {
     /**
      * Delegates to the real engine.
      *
-     * @param mixed $cache See \Mustache_Engine::setCache().
+     * @param \Mustache_Cache $cache See \Mustache_Engine::setCache().
      * @return mixed
      */
     public function setCache(\Mustache_Cache $cache) {

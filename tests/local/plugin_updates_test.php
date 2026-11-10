@@ -23,6 +23,8 @@ use theme_brandable\local\account\connection;
 use theme_brandable\local\generator\generation_manager;
 use theme_brandable\local\generator\generation_result;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(plugin_updates::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(plugin_info::class)]
 /**
  * Tests of the identity of the plugin and of its updates (spec docs/SPEC-plugin-updates.md, contract 15).
  *
@@ -34,8 +36,6 @@ use theme_brandable\local\generator\generation_result;
  * @covers     \theme_brandable\local\plugin_info
  * @covers     \theme_brandable\local\generator\generation_manager
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(plugin_updates::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(plugin_info::class)]
 final class plugin_updates_test extends \advanced_testcase {
     #[\Override]
     public static function setUpBeforeClass(): void {

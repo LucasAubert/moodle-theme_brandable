@@ -20,7 +20,7 @@ namespace theme_brandablert\brandable;
  * Variants of templates for a page type, a page, a course or an activity: the most specific one matching the page
  * wins (activity > course > page > page type), the template of the whole site otherwise.
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

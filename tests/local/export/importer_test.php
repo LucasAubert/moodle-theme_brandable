@@ -21,6 +21,8 @@ use theme_brandable\local\overrides\resolver;
 use theme_brandable\local\overrides\revision_manager;
 use theme_brandable\local\validation\validation_exception;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(importer::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(revision_manager::class)]
 /**
  * Tests for the import of an exported theme.
  *
@@ -31,8 +33,6 @@ use theme_brandable\local\validation\validation_exception;
  * @covers     \theme_brandable\local\export\importer
  * @covers     \theme_brandable\local\overrides\revision_manager
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(importer::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(revision_manager::class)]
 final class importer_test extends \advanced_testcase {
     /** @var \stdClass Course of the course variant. */
     private \stdClass $course;

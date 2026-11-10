@@ -69,6 +69,15 @@ class generation_manager {
 
     /** @var string Event added by the plugin when its validation rejects a result. */
     public const EVENT_REJECTED = 'rejected';
+
+    /**
+     * @var string Event added by the plugin while Brandable is unavailable (contract 7): until when it waits before
+     * reading the generation again (until), since when (since), and when the service came back (ended).
+     */
+    public const EVENT_UNAVAILABLE = 'unavailable';
+
+    /** @var int After this long without Brandable, a generation in progress fails (the prompt can be sent again). */
+    public const MAX_OUTAGE = 30 * MINSECS;
     /**
      * @var string[] Error codes of failures caused by the service (overload, timeout, unreachable API): the same
      * prompt can be sent again a bit later. service_unavailable: the backend (LLM timeout, connection, 429).
@@ -154,6 +163,10 @@ class generation_manager {
             $record->remoteid = $generator->start($prompt, $context);
         } catch (generator_exception $e) {
             self::fail($record, $e->generatorcode, $e->displaymessage, $e->url);
+            if ($e->unavailable) {
+                // The prompt is kept: sent again after Retry-After (by the editor), or with "Try again".
+                self::wait($record, $e->retryafter, $e->displaymessage);
+            }
         }
         $record->id = $DB->insert_record('theme_brandable_generation', $record);
         return $record;
@@ -181,7 +194,8 @@ class generation_manager {
         }
         try {
             $record = $DB->get_record('theme_brandable_generation', ['id' => $id], '*', MUST_EXIST);
-            if ($record->status === self::RUNNING) {
+            // Brandable unavailable: its state is read again after Retry-After, never more often (contract 7).
+            if ($record->status === self::RUNNING && self::waiting_until($record) <= time()) {
                 self::advance($record, $generator ?? factory::get($record->generator));
                 $record->timemodified = time();
                 $DB->update_record('theme_brandable_generation', $record);
@@ -510,7 +524,11 @@ class generation_manager {
      */
     public static function export(stdClass $record): array {
         $events = array_merge(json_decode($record->remoteevents ?: '[]', true), json_decode($record->localevents ?: '[]', true));
-        usort($events, fn($a, $b) => [$a['run'], $a['at']] <=> [$b['run'], $b['at']]);
+        // By run, then by time: parsed, the formats differ (with or without milliseconds); stable on a tie, the events of
+        // Brandable before those of the plugin.
+        usort($events, fn($a, $b) => [$a['run'], self::event_time($a)] <=> [$b['run'], self::event_time($b)]);
+        // The fields of the steps only (an outage also keeps since, until, ended).
+        $events = array_map(fn($event) => array_intersect_key($event, array_flip(['type', 'message', 'at', 'run'])), $events);
         return [
             'id' => (int) $record->id,
             'status' => $record->status,
@@ -520,9 +538,14 @@ class generation_manager {
             'repairs' => (int) $record->repairs,
             'events' => $events,
             'errorcode' => (string) ($record->errorcode ?? ''),
-            // Failures of the service: a clear message instead of the raw one (still in the steps, from the backend).
-            'errormessage' => self::is_transient($record) ? get_string('error:serviceunavailable', 'theme_brandable')
-                : (string) ($record->errormessage ?? ''),
+            // Failures of the service: a clear message instead of the raw one (still in the steps, from the backend);
+            // Brandable unavailable (503, or not reached): its own message, or the one of the plugin.
+            'errormessage' => self::is_transient($record) && self::unavailable_event($record) === null
+                ? get_string('error:serviceunavailable', 'theme_brandable') : (string) ($record->errormessage ?? ''),
+            // Brandable unavailable: until when the progress is not read (running), or when the prompt is sent again
+            // (failed at the start); 0 otherwise.
+            'waitinguntil' => $record->status === self::RUNNING ? max(0, self::waiting_until($record) - time()) : 0,
+            'retryat' => self::is_transient($record) ? self::waiting_until($record) : 0,
             'retryable' => self::is_transient($record) || in_array(self::get_action($record), ['credits', 'plan', 'upgrade'], true),
             'action' => self::get_action($record),
             'errorurl' => (string) ($record->errorurl ?? ''),
@@ -545,9 +568,17 @@ class generation_manager {
         try {
             $status = $generator->poll($record->remoteid);
         } catch (generator_exception $e) {
+            $outage = self::unavailable_event($record);
+            $since = $outage && empty($outage['ended']) ? (int) $outage['since'] : time();
+            if ($e->unavailable && time() - $since < self::MAX_OUTAGE) {
+                // The generation goes on at Brandable (or is marked interrupted there): read again later.
+                self::wait($record, $e->retryafter, $e->displaymessage);
+                return;
+            }
             self::fail($record, $e->generatorcode, $e->displaymessage, $e->url);
             return;
         }
+        self::end_wait($record);
         $record->remoteevents = json_encode($status->events);
 
         if ($status->status === generation_status::ERROR) {
@@ -749,16 +780,92 @@ class generation_manager {
     }
 
     /**
+     * Returns the time of an event, in seconds with its fraction.
+     *
+     * @param array $event Event ('at': ISO 8601).
+     * @return float 0 when unreadable.
+     */
+    private static function event_time(array $event): float {
+        $at = (string) ($event['at'] ?? '');
+        if ($at === '') {
+            return 0.0;
+        }
+        try {
+            return (float) (new \DateTimeImmutable($at))->format('U.u');
+        } catch (\Exception $e) {
+            return 0.0;
+        }
+    }
+
+    /**
      * Adds an event of the plugin.
      *
      * @param stdClass $record Generation record.
      * @param string $type Type.
      * @param string $message Message.
      * @param int $run Run.
+     * @param array $extra Other keys of the event.
      */
-    private static function add_event(stdClass $record, string $type, string $message, int $run): void {
+    private static function add_event(stdClass $record, string $type, string $message, int $run, array $extra = []): void {
         $events = json_decode($record->localevents ?: '[]', true);
-        $events[] = ['type' => $type, 'message' => $message, 'at' => gmdate('Y-m-d\TH:i:s.000\Z'), 'run' => $run];
+        $events[] = ['type' => $type, 'message' => $message, 'at' => gmdate('Y-m-d\TH:i:s.000\Z'), 'run' => $run] + $extra;
         $record->localevents = json_encode($events);
+    }
+
+    /**
+     * Records that Brandable is unavailable (contract 7): one event per outage, whose end of wait follows Retry-After.
+     *
+     * @param stdClass $record Generation record.
+     * @param int $retryafter Retry-After of Brandable, 0 if not said.
+     * @param string $message Message of Brandable (or of the plugin when it could not be reached).
+     */
+    private static function wait(stdClass $record, int $retryafter, string $message): void {
+        $until = time() + ($retryafter > 0 ? $retryafter : api_exception::DEFAULT_RETRY_AFTER);
+        $events = json_decode($record->localevents ?: '[]', true);
+        $last = array_key_last($events);
+        if ($last !== null && $events[$last]['type'] === self::EVENT_UNAVAILABLE && empty($events[$last]['ended'])) {
+            $events[$last]['until'] = $until;
+            $record->localevents = json_encode($events);
+            return;
+        }
+        self::add_event($record, self::EVENT_UNAVAILABLE, $message, (int) $record->repairs, ['since' => time(),
+            'until' => $until]);
+    }
+
+    /**
+     * Brandable answered again: the outage is over.
+     *
+     * @param stdClass $record Generation record.
+     */
+    private static function end_wait(stdClass $record): void {
+        $events = json_decode($record->localevents ?: '[]', true);
+        $last = array_key_last($events);
+        if ($last !== null && $events[$last]['type'] === self::EVENT_UNAVAILABLE && empty($events[$last]['ended'])) {
+            $events[$last]['ended'] = time();
+            $record->localevents = json_encode($events);
+        }
+    }
+
+    /**
+     * The last event of the plugin when it is an outage of Brandable.
+     *
+     * @param stdClass $record Generation record.
+     * @return array|null
+     */
+    private static function unavailable_event(stdClass $record): ?array {
+        $events = json_decode($record->localevents ?: '[]', true);
+        $last = $events ? end($events) : null;
+        return is_array($last) && $last['type'] === self::EVENT_UNAVAILABLE ? $last : null;
+    }
+
+    /**
+     * Until when Brandable is not asked again (Retry-After of the outage in progress), 0 if not waiting.
+     *
+     * @param stdClass $record Generation record.
+     * @return int
+     */
+    private static function waiting_until(stdClass $record): int {
+        $outage = self::unavailable_event($record);
+        return $outage && empty($outage['ended']) ? (int) $outage['until'] : 0;
     }
 }

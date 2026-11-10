@@ -32,6 +32,7 @@
     * isdraft, ispublished, inactive, abandoned, canrestore - Revision state
     * generationid, errormessage, retryable - Failed attempt (retryable: service failure, credits or plan)
     * resumable - Failed attempt whose fonts could not be downloaded (tried again with the same result)
+    * retryat - Brandable unavailable when it was sent: time of the automatic new attempt (countdown), 0 if none
     * accountaction - Failed because of the account: what is offered (theme_brandable/editor_accountaction)
     * hassteps, runs - Steps of the generation
 
@@ -96,6 +97,9 @@
             {{#accountaction}}{{> theme_brandable/editor_accountaction}}{{/accountaction}}
             <div class="tbe-meta"><span>{{#str}} failedattempt, theme_brandable {{/str}}</span>
                 <span>{{#userdate}} {{timecreated}}, {{#str}} strftimedatetimeshort, core_langconfig {{/str}} {{/userdate}}</span></div>
+            {{#retryat}}
+                <p class="tbe-hint mb-1" data-region="autoretry" data-generation="{{generationid}}" aria-live="polite"></p>
+            {{/retryat}}
             {{#retryable}}
                 <button type="button" class="btn btn-sm btn-outline-primary tbe-retry" data-action="retry" data-generation="{{generationid}}"
                     title="{{#str}} retry_help, theme_brandable {{/str}}">{{#str}} retry, theme_brandable {{/str}}</button>

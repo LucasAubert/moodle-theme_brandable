@@ -18,6 +18,10 @@ namespace theme_brandable\local\account;
 
 use theme_brandable\external\get_account;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(account::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(api_client::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(get_account::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\external\billing_checkout::class)]
 /**
  * Tests for the Brandable account of the site, against simulated API answers (contract v1).
  *
@@ -30,10 +34,6 @@ use theme_brandable\external\get_account;
  * @covers     \theme_brandable\external\get_account
  * @covers     \theme_brandable\external\billing_checkout
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(account::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(api_client::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(get_account::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\external\billing_checkout::class)]
 final class account_test extends \advanced_testcase {
     /** @var string A valid site key. */
     private const KEY = 'bsk_9fQxAbCdEfGhIjKlMnOpQrStUvWxYz0123456789-_A';

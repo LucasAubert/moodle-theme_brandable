@@ -165,7 +165,7 @@ class Module {
             try {
                 const result = fn(...args);
                 if (result && typeof result.then === 'function') {
-                    result.then(null, (error) => this.fail(error));
+                    Promise.resolve(result).catch((error) => this.fail(error));
                 }
                 return result;
             } catch (error) {

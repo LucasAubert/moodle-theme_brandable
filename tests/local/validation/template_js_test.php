@@ -20,6 +20,8 @@ use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\resolver;
 use theme_brandable\local\overrides\template_source;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(template_js::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(validator::class)]
 /**
  * Tests for the refusal of executable code added by template overrides.
  *
@@ -30,8 +32,6 @@ use theme_brandable\local\overrides\template_source;
  * @covers     \theme_brandable\local\validation\template_js
  * @covers     \theme_brandable\local\validation\validator
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(template_js::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(validator::class)]
 final class template_js_test extends \advanced_testcase {
     /** @var string Original used by the unit tests. */
     private const ORIGINAL = '<div class="menu" onclick="toggle()">{{> core/x}}<a href="javascript:void(0)">{{name}}</a></div>'

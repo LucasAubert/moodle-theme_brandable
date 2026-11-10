@@ -19,6 +19,9 @@ namespace theme_brandable\local\generator;
 use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\revision_manager;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(generation_manager::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(selection::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(revision_manager::class)]
 /**
  * Tests for the targeted element (selection) and the verification of the selectors in the preview.
  *
@@ -30,9 +33,6 @@ use theme_brandable\local\overrides\revision_manager;
  * @covers     \theme_brandable\local\generator\selection
  * @covers     \theme_brandable\local\overrides\revision_manager
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(generation_manager::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(selection::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(revision_manager::class)]
 final class verification_test extends \advanced_testcase {
     #[\Override]
     protected function setUp(): void {

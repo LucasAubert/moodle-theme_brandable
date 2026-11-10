@@ -19,7 +19,7 @@ namespace theme_brandablert\brandable;
 /**
  * Offline licence pasted by the administrator: checked when saved, its end shown.
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

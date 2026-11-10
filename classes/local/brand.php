@@ -31,15 +31,20 @@ class brand {
     /** @var string Styles of the pages of the plugin, relative to the directory of the plugin. */
     public const STYLES = '/styles/editor.css';
 
+    /** @var string Styles of the preview banner (pages in preview mode). */
+    public const PREVIEW_STYLES = '/styles/preview.css';
+
     /**
-     * Adds the styles of the plugin to the page (before its header). Versioned by the date of the file, for the cache of
+     * Adds styles of the plugin to the page (before its header). Versioned by the date of the file, for the cache of
      * the browser.
+     *
+     * @param string $styles File, relative to the directory of the plugin (default: the pages of the plugin).
      */
-    public static function require_styles(): void {
+    public static function require_styles(string $styles = self::STYLES): void {
         global $PAGE;
-        $file = dirname(__DIR__, 2) . self::STYLES;
+        $file = dirname(__DIR__, 2) . $styles;
         $version = file_exists($file) ? filemtime($file) : 0;
-        $PAGE->requires->css(new moodle_url('/theme/brandable' . self::STYLES, ['v' => $version]));
+        $PAGE->requires->css(new moodle_url('/theme/brandable' . $styles, ['v' => $version]));
     }
 
     /**

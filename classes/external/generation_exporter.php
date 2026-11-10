@@ -50,6 +50,8 @@ class generation_exporter {
             'errorcode' => new external_value(PARAM_RAW, 'Error code when failed'),
             'errormessage' => new external_value(PARAM_RAW, 'Error message when failed, shown as is'),
             'retryable' => new external_value(PARAM_BOOL, 'The same prompt can be sent again (service failure, credits, plan)'),
+            'waitinguntil' => new external_value(PARAM_INT, 'Brandable unavailable: seconds before the progress is read again'),
+            'retryat' => new external_value(PARAM_INT, 'Brandable unavailable at the start: time of the new attempt, 0 if none'),
             'action' => new external_value(PARAM_ALPHA, 'Account error: connect, relink, credits, plan, or empty'),
             'errorurl' => new external_value(PARAM_RAW, 'Page where the administrator can act on the error, empty if none'),
             'selection' => new external_value(PARAM_RAW, 'Element targeted in the preview (JSON), empty if none'),

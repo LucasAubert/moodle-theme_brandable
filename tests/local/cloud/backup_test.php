@@ -26,6 +26,9 @@ use theme_brandable\local\js\review;
 use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\revision_manager;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(backup::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(snapshot::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(status::class)]
 /**
  * Tests for the backup of the versions in the cloud of the Pro offer (contract 13.4, spec C1 to C7): snapshot, order
  * of the sendings, queue, catch-up, origin of a publication.
@@ -38,9 +41,6 @@ use theme_brandable\local\overrides\revision_manager;
  * @covers     \theme_brandable\local\cloud\snapshot
  * @covers     \theme_brandable\local\cloud\status
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(backup::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(snapshot::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(status::class)]
 final class backup_test extends \advanced_testcase {
     /** @var string A valid site key. */
     private const KEY = 'bsk_9fQxAbCdEfGhIjKlMnOpQrStUvWxYz0123456789-_A';

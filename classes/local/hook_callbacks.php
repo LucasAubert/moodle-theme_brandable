@@ -61,7 +61,19 @@ class hook_callbacks {
         if (during_initial_install() || !empty($CFG->upgraderunning) || AJAX_SCRIPT || CLI_SCRIPT) {
             return;
         }
+        self::require_preview_styles();
         self::remind_connection();
+    }
+
+    /**
+     * Adds the styles of the preview banner (in the head: before_standard_top_of_body_html_generation is too late).
+     */
+    public static function require_preview_styles(): void {
+        global $PAGE;
+
+        if ($PAGE->theme->name === 'brandable' && preview::is_active()) {
+            brand::require_styles(brand::PREVIEW_STYLES);
+        }
     }
 
     /**

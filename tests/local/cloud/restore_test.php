@@ -27,6 +27,9 @@ use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\resolver;
 use theme_brandable\local\overrides\revision_manager;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(restore::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(get_cloud_history::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(restore_cloud_version::class)]
 /**
  * Tests for the restoration and the pull of a version of the project (contract 13.5, spec C8 to C13).
  *
@@ -38,9 +41,6 @@ use theme_brandable\local\overrides\revision_manager;
  * @covers     \theme_brandable\external\get_cloud_history
  * @covers     \theme_brandable\external\restore_cloud_version
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(restore::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(get_cloud_history::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(restore_cloud_version::class)]
 final class restore_test extends \advanced_testcase {
     /** @var string Signature of the right form. */
     private const SIGNATURE = 'v1.testSignatureNotFromBrandable00';

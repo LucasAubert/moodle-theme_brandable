@@ -20,7 +20,7 @@ namespace theme_brandablert\brandable;
  * Scope of a template variant or of a SCSS chunk: site, page type, page (bp-* key), course or activity. Courses and
  * activities are found on this site by the key chosen at the export (shortname or idnumber, or the id).
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

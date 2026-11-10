@@ -45,6 +45,10 @@ let busy = false;
 
 /** @type {Number} Delay between two polls of a generation, in milliseconds. */
 const POLL_INTERVAL = 1500;
+/** @type {Set<Number>} Prompts sent again automatically after an outage of Brandable (once each). */
+const autoRetried = new Set();
+/** @type {Number|null} Countdown of the automatic new attempt. */
+let autoRetryTimer = null;
 
 /** @type {Object|null} Generation being followed. */
 let generation = null;
@@ -135,29 +139,35 @@ const errorStrings = {
  */
 export const describeError = (failure) => {
     const call = failure && failure.call ? failure.call : '';
-    const error = failure && failure.call ? failure.error : failure;
-    let message = '';
-    let code = '';
+    const {message, code} = describeCause(failure && failure.call ? failure.error : failure);
+    return {message: message || errorStrings.network, details: [call, code].filter((part) => part).join(' · ')};
+};
+
+/**
+ * Turns the error of an editor call into a message (empty when unknown) and a code.
+ *
+ * @param {*} error Error.
+ * @returns {{message: String, code: String}}
+ */
+const describeCause = (error) => {
     if (error instanceof Error || (typeof DOMException !== 'undefined' && error instanceof DOMException)) {
         // Failure of fetch() (core/ajax from Moodle 5.3): TypeError when the network failed, AbortError on the timeout,
         // Error "HTTP <status>" on an answer that is not one of service.php. Never an errorcode.
         const timedout = error.name === 'AbortError' || error.name === 'TimeoutError';
-        message = timedout ? errorStrings.timeout : errorStrings.network;
-        code = timedout ? 'timeout' : 'network';
-    } else if (error && typeof error === 'object') {
+        return timedout ? {message: errorStrings.timeout, code: 'timeout'} : {message: errorStrings.network, code: 'network'};
+    }
+    if (error && typeof error === 'object') {
         // Exception of the function ({message, errorcode}) or error of the whole request ({error, errorcode}).
-        message = error.message || (typeof error.error === 'string' ? error.error : '');
-        code = error.errorcode || '';
-    } else if (typeof error === 'string') {
-        // jQuery error text: 'timeout', or '' / 'error' / 'abort' when the network failed.
-        message = error === 'timeout' ? errorStrings.timeout
-            : (['', 'error', 'abort'].includes(error) ? errorStrings.network : error);
-        code = error === 'timeout' ? 'timeout' : 'network';
+        return {message: error.message || (typeof error.error === 'string' ? error.error : ''), code: error.errorcode || ''};
     }
-    if (!message) {
-        message = errorStrings.network;
+    if (typeof error !== 'string') {
+        return {message: '', code: ''};
     }
-    return {message, details: [call, code].filter((part) => part).join(' · ')};
+    // Error text of jQuery: 'timeout', or '' / 'error' / 'abort' when the network failed.
+    if (error === 'timeout') {
+        return {message: errorStrings.timeout, code: 'timeout'};
+    }
+    return {message: ['', 'error', 'abort'].includes(error) ? errorStrings.network : error, code: 'network'};
 };
 
 /**
@@ -329,6 +339,8 @@ const render = async(current) => {
                 abandoned: false,
                 retryable: !!g.retryable && !g.resumable,
                 resumable: !!g.resumable,
+                // Brandable unavailable when it was sent: new attempt at that time (only while it is to come).
+                retryat: g.retryat && g.retryat * 1000 > Date.now() && !autoRetried.has(g.id) ? g.retryat : 0,
                 generationid: g.id,
                 prompt: g.prompt,
                 errormessage: g.errormessage,
@@ -414,6 +426,43 @@ const render = async(current) => {
     await showAnswering();
     thread.scrollTop = thread.scrollHeight;
     followCloud(current);
+    await scheduleAutoRetry(current);
+};
+
+/**
+ * Brandable was unavailable when the last prompt was sent (contract 7): counts down to its Retry-After, then sends the
+ * prompt again, once. "Try again" stays available meanwhile.
+ *
+ * @param {Object} current Editor state.
+ */
+const scheduleAutoRetry = async(current) => {
+    clearInterval(autoRetryTimer);
+    autoRetryTimer = null;
+    const newest = (current.generations || []).reduce((last, g) => (!last || g.id > last.id ? g : last), null);
+    if (!newest || newest.status !== 'failed' || !newest.retryat || autoRetried.has(newest.id)) {
+        return;
+    }
+    const node = region('thread').querySelector(`[data-region="autoretry"][data-generation="${newest.id}"]`);
+    if (!node) {
+        return;
+    }
+    const tick = async() => {
+        const left = newest.retryat - Math.floor(Date.now() / 1000);
+        if (left > 0) {
+            node.textContent = await getString('generation:autoretry', 'theme_brandable', left);
+            return;
+        }
+        clearInterval(autoRetryTimer);
+        autoRetryTimer = null;
+        if (busy || autoRetried.has(newest.id)) {
+            return;
+        }
+        autoRetried.add(newest.id);
+        node.hidden = true;
+        await retry(newest.id);
+    };
+    autoRetryTimer = setInterval(tick, 1000);
+    await tick();
 };
 
 /**
@@ -827,9 +876,13 @@ const buildRuns = async(events) => {
  * @param {Object} current Generation (get_generation result).
  */
 const renderGeneration = async(current) => {
+    // Brandable unavailable while it works (contract 7): the request is kept, its progress read again later.
+    const waiting = current.status === 'running' && current.waitinguntil > 0;
     const {html} = await Templates.renderForPromise('theme_brandable/editor_generation', {
         prompt: current.prompt,
-        running: current.status === 'running',
+        running: current.status === 'running' && !waiting,
+        waiting,
+        waitingmessage: waiting ? await getString('generation:waiting', 'theme_brandable', current.waitinguntil) : '',
         failed: current.status === 'failed',
         errormessage: current.errormessage,
         runs: await buildRuns(current.events),
@@ -864,7 +917,9 @@ const follow = async(current) => {
     generation = current;
     await renderGeneration(current);
     while (generation.status === 'running') {
-        await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
+        // Brandable unavailable: not asked again before its Retry-After.
+        const delay = generation.waitinguntil > 0 ? generation.waitinguntil * 1000 : POLL_INTERVAL;
+        await new Promise((resolve) => setTimeout(resolve, delay));
         generation = await Repository.getGeneration(generation.id);
         await renderGeneration(generation);
     }
@@ -1322,6 +1377,120 @@ const acceptJs = async(id, version) => {
 };
 
 /**
+ * Actions of the editor buttons (data-action), by name: called with the button, may throw when a confirmation is
+ * cancelled.
+ *
+ * @type {Object<String, Function>}
+ */
+const actions = {
+    undo: async() => {
+        await run(Repository.undo);
+    },
+    redo: async() => {
+        await run(Repository.redo);
+    },
+    restore: async(button) => {
+        await run(() => Repository.restore(Number(button.dataset.revision || 0)));
+    },
+    publish: async() => {
+        await publish();
+    },
+    discard: async() => {
+        await confirm('confirmdiscard', 'discard');
+        await run(Repository.discard);
+    },
+    revert: async() => {
+        await confirm(state && state.unpublished ? 'confirmrevertdraft' : 'confirmrevert', 'version:revert');
+        await run(Repository.revertVersion);
+    },
+    reload: () => {
+        reloadPreview();
+    },
+    rescope: async(button) => {
+        await run(() => Repository.changeScope(Number(button.dataset.change), button.dataset.level,
+            button.dataset.value));
+    },
+    pick: () => {
+        picker.setActive(!picker.active);
+    },
+    retry: async(button) => {
+        await retry(Number(button.dataset.generation));
+    },
+    account: async() => {
+        await toggleAccount(region('account').hidden);
+    },
+    recharge: async() => {
+        await toggleAccount(true);
+        region('account').querySelector('[data-region="accountrecharge"]')?.scrollIntoView({block: 'nearest'});
+    },
+    interval: (button) => {
+        showInterval(button);
+    },
+    checkout: async(button) => {
+        await checkout(button.dataset.kind, button.dataset.item, button);
+    },
+    disconnect: async() => {
+        await confirm('account:confirmdisconnect', 'account:disconnect');
+        await disconnectSite(false);
+    },
+    forget: async() => {
+        await disconnectSite(true);
+    },
+    answer: async() => {
+        setAside = 0;
+        await showAnswering();
+        region('prompt').focus();
+    },
+    newrequest: async() => {
+        setAside = answering ? answering.id : 0;
+        await showAnswering();
+        region('prompt').focus();
+    },
+    history: async(button) => {
+        if (history.isOpen()) {
+            history.close();
+        } else {
+            await history.open();
+        }
+        button.closest('.tbe').querySelector('[data-action="history"]').setAttribute('aria-expanded',
+            history.isOpen() ? 'true' : 'false');
+    },
+    cloudretry: async() => {
+        cloudRefreshes = 0;
+        await run(Repository.cloudRetry, false);
+    },
+    jsactivate: async(button) => {
+        await showJsConsent(Number(button.dataset.generation));
+    },
+    jsaccept: async(button) => {
+        await acceptJs(Number(button.dataset.generation), button.dataset.version);
+    },
+    jscancel: (button) => {
+        hideJsConsent(Number(button.dataset.generation));
+    },
+    jsresend: async(button) => {
+        await start(() => Repository.resendGeneration(Number(button.dataset.generation)));
+    },
+    removeselection: () => {
+        selection = null;
+        showSelection();
+    },
+    dismisserrors: () => {
+        errors = [];
+        showErrors();
+    },
+    dismissupdate: async(button) => {
+        // Banner of a new version of the plugin, closed for this version (spec U3).
+        await Repository.dismissPluginUpdate(Number(button.dataset.version));
+        region('pluginupdate')?.remove();
+    },
+    reactivate: async() => {
+        // Any editor call turns the preview back on (server side); then the iframe is reloaded.
+        await run(Repository.getRevisions);
+    },
+};
+
+/**
  * Handles clicks on the actions of the editor.
  *
  * @param {MouseEvent} e Click event.
@@ -1339,115 +1508,11 @@ const handleClick = async(e) => {
         togglePreviewMode();
         return;
     }
-    const revisionid = Number(button.dataset.revision || 0);
+    if (!Object.prototype.hasOwnProperty.call(actions, button.dataset.action)) {
+        return;
+    }
     try {
-        switch (button.dataset.action) {
-            case 'undo':
-                await run(Repository.undo);
-                break;
-            case 'redo':
-                await run(Repository.redo);
-                break;
-            case 'restore':
-                await run(() => Repository.restore(revisionid));
-                break;
-            case 'publish':
-                await publish();
-                break;
-            case 'discard':
-                await confirm('confirmdiscard', 'discard');
-                await run(Repository.discard);
-                break;
-            case 'revert':
-                await confirm(state && state.unpublished ? 'confirmrevertdraft' : 'confirmrevert', 'version:revert');
-                await run(Repository.revertVersion);
-                break;
-            case 'reload':
-                reloadPreview();
-                break;
-            case 'rescope':
-                await run(() => Repository.changeScope(Number(button.dataset.change), button.dataset.level,
-                    button.dataset.value));
-                break;
-            case 'pick':
-                picker.setActive(!picker.active);
-                break;
-            case 'retry':
-                await retry(Number(button.dataset.generation));
-                break;
-            case 'account':
-                await toggleAccount(region('account').hidden);
-                break;
-            case 'recharge':
-                await toggleAccount(true);
-                region('account').querySelector('[data-region="accountrecharge"]')?.scrollIntoView({block: 'nearest'});
-                break;
-            case 'interval':
-                showInterval(button);
-                break;
-            case 'checkout':
-                await checkout(button.dataset.kind, button.dataset.item, button);
-                break;
-            case 'disconnect':
-                await confirm('account:confirmdisconnect', 'account:disconnect');
-                await disconnectSite(false);
-                break;
-            case 'forget':
-                await disconnectSite(true);
-                break;
-            case 'answer':
-                setAside = 0;
-                await showAnswering();
-                region('prompt').focus();
-                break;
-            case 'newrequest':
-                setAside = answering ? answering.id : 0;
-                await showAnswering();
-                region('prompt').focus();
-                break;
-            case 'history':
-                if (history.isOpen()) {
-                    history.close();
-                } else {
-                    await history.open();
-                }
-                button.closest('.tbe').querySelector('[data-action="history"]').setAttribute('aria-expanded',
-                    history.isOpen() ? 'true' : 'false');
-                break;
-            case 'cloudretry':
-                cloudRefreshes = 0;
-                await run(Repository.cloudRetry, false);
-                break;
-            case 'jsactivate':
-                await showJsConsent(Number(button.dataset.generation));
-                break;
-            case 'jsaccept':
-                await acceptJs(Number(button.dataset.generation), button.dataset.version);
-                break;
-            case 'jscancel':
-                hideJsConsent(Number(button.dataset.generation));
-                break;
-            case 'jsresend':
-                await start(() => Repository.resendGeneration(Number(button.dataset.generation)));
-                break;
-            case 'removeselection':
-                selection = null;
-                showSelection();
-                break;
-            case 'dismisserrors':
-                errors = [];
-                showErrors();
-                break;
-            case 'dismissupdate':
-                // Banner of a new version of the plugin, closed for this version (spec U3).
-                await Repository.dismissPluginUpdate(Number(button.dataset.version));
-                region('pluginupdate')?.remove();
-                break;
-            case 'reactivate':
-                // Any editor call turns the preview back on (server side); then the iframe is reloaded.
-                await run(Repository.getRevisions);
-                break;
-        }
+        await actions[button.dataset.action](button);
     } catch (error) {
         // Confirmation cancelled.
         return;

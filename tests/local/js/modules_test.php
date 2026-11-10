@@ -24,6 +24,8 @@ use theme_brandable\local\preview;
 use theme_brandable\local\validation\validation_exception;
 use theme_brandable\local\validation\validator;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(modules::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(validator::class)]
 /**
  * Tests for the generated JavaScript modules: validation, storage, choice of the modules of a page, conditions of
  * execution and file of the modules (spec docs/SPEC-javascript.md, B5 to B8).
@@ -35,8 +37,6 @@ use theme_brandable\local\validation\validator;
  * @covers     \theme_brandable\local\js\modules
  * @covers     \theme_brandable\local\validation\validator
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(modules::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(validator::class)]
 final class modules_test extends \advanced_testcase {
     /** @var string A signature of the right form (not checked by the plugin, contract 12.3). */
     private const SIGNATURE = 'v1.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQ';

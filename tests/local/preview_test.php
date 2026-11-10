@@ -20,6 +20,8 @@ use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\context;
 use theme_brandable\local\overrides\revision_manager;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(preview::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(hook_callbacks::class)]
 /**
  * Tests for the preview mode.
  *
@@ -30,8 +32,6 @@ use theme_brandable\local\overrides\revision_manager;
  * @covers     \theme_brandable\local\preview
  * @covers     \theme_brandable\local\hook_callbacks
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(preview::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(hook_callbacks::class)]
 final class preview_test extends \advanced_testcase {
     #[\Override]
     protected function setUp(): void {

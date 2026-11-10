@@ -20,7 +20,7 @@ namespace theme_brandablert\brandable;
  * Manifest of the exported version (brandable/manifest.json): parent, SCSS chunks and template variants with their
  * scopes. Data only: no secret (the licence is in licence.php).
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

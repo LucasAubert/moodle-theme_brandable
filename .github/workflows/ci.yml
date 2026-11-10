@@ -1,6 +1,7 @@
 # Moodle Plugin CI (moodlehq/moodle-plugin-ci, template gha.dist.yml), the checks of Moodle Marketplace: on every push
-# and pull request of the public repository moodle-theme_brandable; in the private repository, on demand only
-# (./dev.sh ci, or "Run workflow" in GitHub). Left out of the zip (.gitattributes), copied by ./dev.sh mirror.
+# and pull request of the public repository moodle-theme_brandable, on demand in the private one. Kept for later: the
+# reference CI is ./dev.sh ci, run locally with the same steps (tools/ci). Left out of the zip (.gitattributes), copied
+# by ./dev.sh mirror.
 name: Moodle Plugin CI
 
 on: [push, pull_request, workflow_dispatch]

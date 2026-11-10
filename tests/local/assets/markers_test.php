@@ -25,6 +25,9 @@ use theme_brandable\local\overrides\scss;
 use theme_brandable\local\validation\validation_exception;
 use theme_brandable\local\validation\validator;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(markers::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(settings::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\output\core_renderer::class)]
 /**
  * Tests for the markers of the library and the settings changes (spec A9, A10; contract 11.3, 11.4).
  *
@@ -36,9 +39,6 @@ use theme_brandable\local\validation\validator;
  * @covers     \theme_brandable\local\assets\settings
  * @covers     \theme_brandable\output\core_renderer
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(markers::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(settings::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\output\core_renderer::class)]
 final class markers_test extends \advanced_testcase {
     #[\Override]
     protected function setUp(): void {

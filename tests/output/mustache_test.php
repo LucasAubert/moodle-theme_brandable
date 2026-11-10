@@ -23,6 +23,10 @@ use theme_brandable\output\mustache\injector;
 use theme_brandable\output\mustache\lazy_engine;
 use theme_brandable\output\mustache\loader;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(loader::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(injector::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(lazy_engine::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(renderer_factory::class)]
 /**
  * Tests for the DB-first Mustache loader and its injection into every renderer (D1).
  *
@@ -35,10 +39,6 @@ use theme_brandable\output\mustache\loader;
  * @covers     \theme_brandable\output\mustache\lazy_engine
  * @covers     \theme_brandable\output\renderer_factory
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(loader::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(injector::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(lazy_engine::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(renderer_factory::class)]
 final class mustache_test extends \advanced_testcase {
     #[\Override]
     protected function setUp(): void {

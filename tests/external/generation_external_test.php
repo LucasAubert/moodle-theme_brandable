@@ -20,6 +20,11 @@ use core_external\external_api;
 use theme_brandable\local\inspector\inspector;
 use theme_brandable\local\overrides\revision_manager;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(submit_prompt::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(get_generation::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(apply_changes::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(get_template_source::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(get_page_templates::class)]
 /**
  * Tests for the generation, apply and inspection external functions.
  *
@@ -33,11 +38,6 @@ use theme_brandable\local\overrides\revision_manager;
  * @covers     \theme_brandable\external\get_template_source
  * @covers     \theme_brandable\external\get_page_templates
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(submit_prompt::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(get_generation::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(apply_changes::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(get_template_source::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(get_page_templates::class)]
 final class generation_external_test extends \advanced_testcase {
     #[\Override]
     protected function setUp(): void {

@@ -20,6 +20,9 @@ use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\resolver;
 use theme_brandable\local\overrides\template_source;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(validator::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(scss_compiler::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(template_source::class)]
 /**
  * Tests for the validation of changes before a revision is written.
  *
@@ -31,9 +34,6 @@ use theme_brandable\local\overrides\template_source;
  * @covers     \theme_brandable\local\validation\scss_compiler
  * @covers     \theme_brandable\local\overrides\template_source
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(validator::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(scss_compiler::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(template_source::class)]
 final class validator_test extends \advanced_testcase {
     #[\Override]
     protected function setUp(): void {

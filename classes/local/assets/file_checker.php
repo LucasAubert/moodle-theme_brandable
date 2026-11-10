@@ -284,12 +284,10 @@ class file_checker {
         $scale = min(1, self::MAX_SIDE / max($width, $height));
         if ($scale < 1) {
             $resized = imagescale($image, max(1, (int) round($width * $scale)), max(1, (int) round($height * $scale)));
-            imagedestroy($image);
             $image = $resized;
         }
         $out = self::gd_write($image, $mime);
         $result = ['content' => $out, 'mime' => $mime, 'width' => imagesx($image), 'height' => imagesy($image)];
-        imagedestroy($image);
         return $result;
     }
 
@@ -307,11 +305,11 @@ class file_checker {
             return null;
         }
         $resized = imagescale($image, max(1, $width), max(1, $height));
-        imagedestroy($image);
+        // Freed now (a GdImage object since PHP 8.0: no imagedestroy(), deprecated in PHP 8.5).
+        unset($image);
         imagealphablending($resized, false);
         imagesavealpha($resized, true);
         $out = self::gd_write($resized, $mime);
-        imagedestroy($resized);
         return $out;
     }
 
@@ -343,7 +341,6 @@ class file_checker {
         }
         ob_start();
         imagewebp($image, null, 85);
-        imagedestroy($image);
         return (string) ob_get_clean();
     }
 
@@ -380,7 +377,6 @@ class file_checker {
         $scale = min(1, self::THUMBNAIL_SIDE / max($width, $height));
         if ($scale < 1) {
             $resized = imagescale($image, max(1, (int) round($width * $scale)), max(1, (int) round($height * $scale)));
-            imagedestroy($image);
             $image = $resized;
         }
         $transparent = in_array($mime, ['image/png', 'image/gif', 'image/webp'], true);
@@ -388,12 +384,10 @@ class file_checker {
             foreach ($type === 'image/jpeg' ? [80, 60, 40] : [null] as $quality) {
                 $out = self::gd_write($image, $type, $quality);
                 if (strlen($out) <= self::THUMBNAIL_BYTES) {
-                    imagedestroy($image);
                     return ['content' => $out, 'mime' => $type];
                 }
             }
         }
-        imagedestroy($image);
         return null;
     }
 

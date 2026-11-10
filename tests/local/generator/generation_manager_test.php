@@ -20,6 +20,11 @@ use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\resolver;
 use theme_brandable\local\overrides\revision_manager;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(generation_manager::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(sync_generator::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(mock_generator::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(generation_status::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(generation_result::class)]
 /**
  * Tests for the generation orchestration (start, polling relay, validation, repairs) and the mock generator.
  *
@@ -33,11 +38,6 @@ use theme_brandable\local\overrides\revision_manager;
  * @covers     \theme_brandable\local\generator\generation_status
  * @covers     \theme_brandable\local\generator\generation_result
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(generation_manager::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(sync_generator::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(mock_generator::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(generation_status::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(generation_result::class)]
 final class generation_manager_test extends \advanced_testcase {
     #[\Override]
     protected function setUp(): void {
@@ -133,6 +133,28 @@ final class generation_manager_test extends \advanced_testcase {
         // Polling again changes nothing (no second revision).
         generation_manager::refresh($record->id);
         $this->assertCount(1, revision_manager::get_history());
+    }
+
+    public function test_events_in_order_of_time_whatever_their_format(): void {
+        global $DB;
+
+        $record = generation_manager::refresh(generation_manager::submit('Rounded corners')->id);
+        // Brandable without milliseconds, the plugin with: in the same second, the plugin's event comes after.
+        $DB->set_field('theme_brandable_generation', 'remoteevents', json_encode([
+            ['type' => 'done', 'message' => 'Done', 'at' => '2026-11-09T10:00:05Z', 'run' => 0],
+            ['type' => 'planning', 'message' => 'Planning', 'at' => '2026-11-09T10:00:04Z', 'run' => 0],
+        ]), ['id' => $record->id]);
+        $DB->set_field('theme_brandable_generation', 'localevents', json_encode([
+            ['type' => 'verified', 'message' => 'Verified', 'at' => '2026-11-09T10:00:05.000Z', 'run' => 0],
+            ['type' => 'error', 'message' => 'Error', 'at' => '2026-11-09T10:00:04.500Z', 'run' => 0],
+            ['type' => 'repair', 'message' => 'Repair', 'at' => '2026-11-09T10:00:01.000Z', 'run' => 1],
+        ]), ['id' => $record->id]);
+        $record = $DB->get_record('theme_brandable_generation', ['id' => $record->id]);
+
+        $this->assertSame(
+            ['planning', 'error', 'done', 'verified', 'repair'],
+            array_column(generation_manager::export($record)['events'], 'type')
+        );
     }
 
     public function test_mock_without_keyword_still_produces_a_valid_change(): void {
@@ -240,6 +262,125 @@ final class generation_manager_test extends \advanced_testcase {
         $export = generation_manager::export($record);
         $this->assertTrue($export['retryable']);
         $this->assertContains('Impossible de joindre l\'API Brandable : timeout', array_column($export['events'], 'message'));
+    }
+
+    /**
+     * A generator whose progress cannot be read the first times (Brandable unavailable, contract 7).
+     *
+     * @param int $outages Polls that fail before the result is read.
+     * @return sync_generator
+     */
+    private function unavailable_while_polling(int $outages): sync_generator {
+        $generator = new class extends sync_generator {
+            /** @var int Polls that still fail. */
+            public int $outages = 0;
+            /** @var int Polls asked. */
+            public int $polls = 0;
+
+            #[\Override]
+            public function generate(string $prompt, generation_context $context): generation_result {
+                return generation_result::from_array(['summary' => 'Done', 'changes' => [['type' => 'scss',
+                    'target' => 'post/outage', 'content' => '.card { border-radius: 1rem; }']]]);
+            }
+
+            #[\Override]
+            public function poll(string $id): \theme_brandable\local\generator\generation_status {
+                $this->polls++;
+                if ($this->outages > 0) {
+                    $this->outages--;
+                    throw new generator_exception(
+                        'service_unavailable',
+                        'Brandable est momentanément indisponible.',
+                        '',
+                        30,
+                        true
+                    );
+                }
+                return parent::poll($id);
+            }
+        };
+        $generator->outages = $outages;
+        return $generator;
+    }
+
+    /**
+     * Moves the end of the wait of a generation to the past (its Retry-After is over).
+     *
+     * @param int $id Generation id.
+     * @param int $since Start of the outage, unchanged when 0.
+     */
+    private function end_of_wait(int $id, int $since = 0): void {
+        global $DB;
+        $events = json_decode($DB->get_field('theme_brandable_generation', 'localevents', ['id' => $id]), true);
+        $last = array_key_last($events);
+        $events[$last]['until'] = time() - 1;
+        if ($since) {
+            $events[$last]['since'] = $since;
+        }
+        $DB->set_field('theme_brandable_generation', 'localevents', json_encode($events), ['id' => $id]);
+    }
+
+    public function test_brandable_unavailable_while_generating(): void {
+        $generator = $this->unavailable_while_polling(1);
+        $id = (int) generation_manager::submit('prompt', null, $generator)->id;
+
+        // 503 while the progress is read: the request is kept, read again after the Retry-After only.
+        $record = generation_manager::refresh($id, $generator);
+        $this->assertSame(generation_manager::RUNNING, $record->status);
+        $export = generation_manager::export($record);
+        $this->assertEqualsWithDelta(30, $export['waitinguntil'], 2);
+        $this->assertContains('Brandable est momentanément indisponible.', array_column($export['events'], 'message'));
+        $this->assertSame(['type', 'message', 'at', 'run'], array_keys(end($export['events'])));
+        generation_manager::refresh($id, $generator);
+        $this->assertSame(1, $generator->polls);
+
+        // Back: the result is read and becomes a revision.
+        $this->end_of_wait($id);
+        $record = generation_manager::refresh($id, $generator);
+        $this->assertSame(generation_manager::COMPLETED, $record->status);
+        $this->assertSame(0, generation_manager::export($record)['waitinguntil']);
+    }
+
+    public function test_long_outage_fails_the_generation(): void {
+        $generator = $this->unavailable_while_polling(2);
+        $id = (int) generation_manager::submit('prompt', null, $generator)->id;
+        generation_manager::refresh($id, $generator);
+        $this->end_of_wait($id, time() - generation_manager::MAX_OUTAGE - 1);
+        $record = generation_manager::refresh($id, $generator);
+        $this->assertSame(generation_manager::FAILED, $record->status);
+        $export = generation_manager::export($record);
+        $this->assertTrue($export['retryable']);
+        // The message of Brandable, not the one of an overloaded generation.
+        $this->assertSame('Brandable est momentanément indisponible.', $export['errormessage']);
+    }
+
+    public function test_brandable_unavailable_when_the_prompt_is_sent(): void {
+        $generator = new class extends sync_generator {
+            #[\Override]
+            public function start(string $prompt, generation_context $context): string {
+                throw new generator_exception(
+                    'service_unavailable',
+                    'Brandable est momentanément indisponible.',
+                    '',
+                    45,
+                    true
+                );
+            }
+
+            #[\Override]
+            public function generate(string $prompt, generation_context $context): generation_result {
+                throw new \coding_exception('Not called');
+            }
+        };
+        $record = generation_manager::submit('Make it blue', null, $generator);
+        $this->assertSame(generation_manager::FAILED, $record->status);
+        $export = generation_manager::export($record);
+        // The prompt is kept: sent again at the Retry-After by the editor, or with "Try again".
+        $this->assertSame('Make it blue', $export['prompt']);
+        $this->assertTrue($export['retryable']);
+        $this->assertEqualsWithDelta(time() + 45, $export['retryat'], 2);
+        $this->assertSame('Brandable est momentanément indisponible.', $export['errormessage']);
+        $this->assertSame(0, $export['waitinguntil']);
     }
 
     public function test_draft_moved_during_generation(): void {

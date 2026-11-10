@@ -24,6 +24,11 @@ use theme_brandable\local\account\connection;
 use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\revision_manager;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(review::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(jsdownload::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(get_js_review::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(mark_js_reviewed::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(ask_js_review::class)]
 /**
  * Tests for the review of the generated JavaScript before publishing (spec B13), the security review of Brandable
  * (contract 12.6) and the download of the JavaScript of a version (B14).
@@ -38,11 +43,6 @@ use theme_brandable\local\overrides\revision_manager;
  * @covers     \theme_brandable\external\mark_js_reviewed
  * @covers     \theme_brandable\external\ask_js_review
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(review::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(jsdownload::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(get_js_review::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(mark_js_reviewed::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(ask_js_review::class)]
 final class review_test extends \advanced_testcase {
     /** @var string A valid site key. */
     private const KEY = 'bsk_9fQxAbCdEfGhIjKlMnOpQrStUvWxYz0123456789-_A';

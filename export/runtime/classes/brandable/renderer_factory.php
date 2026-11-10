@@ -24,7 +24,7 @@ use theme_brandablert\brandable\mustache\injector;
  * Renderer factory: the standard theme_overridden_renderer_factory, plus the loader of the template variants in every
  * renderer it creates (core, plugins, blocks...).
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

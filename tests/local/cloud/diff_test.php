@@ -18,6 +18,7 @@ namespace theme_brandable\local\cloud;
 
 use theme_brandable\local\account\api_client;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(diff::class)]
 /**
  * Tests for the comparison of two versions of the project (contract 13.6, spec C14).
  *
@@ -27,7 +28,6 @@ use theme_brandable\local\account\api_client;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \theme_brandable\local\cloud\diff
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(diff::class)]
 final class diff_test extends \advanced_testcase {
     /**
      * A client giving one answer, recording the paths.

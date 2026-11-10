@@ -21,7 +21,7 @@ use theme_brandablert\brandable\licence;
 /**
  * Daily signal of the licence (minute and hour drawn at the installation): new token, state of the licence.
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

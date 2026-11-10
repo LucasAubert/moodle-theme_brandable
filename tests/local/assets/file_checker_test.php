@@ -16,6 +16,8 @@
 
 namespace theme_brandable\local\assets;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(file_checker::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(svg::class)]
 /**
  * Tests for the checks of the files added to the library (spec A2, A3, A8).
  *
@@ -26,8 +28,6 @@ namespace theme_brandable\local\assets;
  * @covers     \theme_brandable\local\assets\file_checker
  * @covers     \theme_brandable\local\assets\svg
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(file_checker::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(svg::class)]
 final class file_checker_test extends \advanced_testcase {
     /** @var string Folder of the test files. */
     private string $dir;

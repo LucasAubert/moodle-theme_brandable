@@ -16,6 +16,9 @@
 
 namespace theme_brandable\local;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(settings_mirror::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(observer::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\task\sync_parent_settings::class)]
 /**
  * Tests for the parent theme settings mirror, its observer and its scheduled task.
  *
@@ -27,9 +30,6 @@ namespace theme_brandable\local;
  * @covers     \theme_brandable\local\observer
  * @covers     \theme_brandable\task\sync_parent_settings
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(settings_mirror::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(observer::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\task\sync_parent_settings::class)]
 final class settings_mirror_test extends \advanced_testcase {
     use \theme_brandable\tests\requires_classic;
 

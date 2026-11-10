@@ -21,7 +21,7 @@ use core_privacy\local\metadata\collection;
 /**
  * Privacy provider: no personal data stored; the daily signal of the licence only sends data about the site.
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

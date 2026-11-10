@@ -22,7 +22,8 @@
 
     Context variables required for this template:
     * prompt - Prompt
-    * running - Whether the generation is still running
+    * running - Whether the generation is still running (and Brandable answers)
+    * waiting, waitingmessage - Brandable unavailable while it runs: the request is kept, read again later
     * failed - Whether it failed
     * errormessage - Error shown as is
     * runs - Attempts: label, events (message, isrejected)
@@ -31,6 +32,8 @@
     {
         "prompt": "Make the navbar dark",
         "running": true,
+        "waiting": false,
+        "waitingmessage": "",
         "failed": false,
         "errormessage": "",
         "runs": [
@@ -54,6 +57,9 @@
         {{#running}}
             <div class="tbe-working"><span class="tbe-spinner" aria-hidden="true"></span>{{#str}} generating, theme_brandable {{/str}}</div>
         {{/running}}
+        {{#waiting}}
+            <div class="tbe-working" role="status"><span class="tbe-spinner" aria-hidden="true"></span>{{waitingmessage}}</div>
+        {{/waiting}}
         {{#failed}}
             <div class="tbe-error" role="alert">{{errormessage}}</div>
         {{/failed}}

@@ -16,6 +16,7 @@
 
 namespace theme_brandable\local\generator;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(remote_generator::class)]
 /**
  * Tests for the Brandable API client (HTTP responses mocked).
  *
@@ -25,7 +26,6 @@ namespace theme_brandable\local\generator;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \theme_brandable\local\generator\remote_generator
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(remote_generator::class)]
 final class remote_generator_test extends \advanced_testcase {
     #[\Override]
     public static function setUpBeforeClass(): void {

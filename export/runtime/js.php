@@ -20,7 +20,7 @@
  *
  * Public (the pages of every visitor load it) and immutable at its URL (hash); nothing when the modules are turned off.
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

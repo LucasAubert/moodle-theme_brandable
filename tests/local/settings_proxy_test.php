@@ -16,6 +16,8 @@
 
 namespace theme_brandable\local;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(settings_proxy::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\admin\settings_page::class)]
 /**
  * Tests for the parent settings proxy and Brandable's settings page.
  *
@@ -26,8 +28,6 @@ namespace theme_brandable\local;
  * @covers     \theme_brandable\local\settings_proxy
  * @covers     \theme_brandable\admin\settings_page
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(settings_proxy::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\admin\settings_page::class)]
 final class settings_proxy_test extends \advanced_testcase {
     use \theme_brandable\tests\requires_classic;
 

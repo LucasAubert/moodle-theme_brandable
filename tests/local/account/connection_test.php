@@ -18,6 +18,9 @@ namespace theme_brandable\local\account;
 
 use theme_brandable\local\generator\factory;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(connection::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(factory::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\local\hook_callbacks::class)]
 /**
  * Tests for the connection of the site to a Brandable account (key, PKCE flow, dev mode).
  *
@@ -29,9 +32,6 @@ use theme_brandable\local\generator\factory;
  * @covers     \theme_brandable\local\generator\factory
  * @covers     \theme_brandable\local\hook_callbacks
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(connection::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(factory::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\local\hook_callbacks::class)]
 final class connection_test extends \advanced_testcase {
     #[\Override]
     protected function setUp(): void {

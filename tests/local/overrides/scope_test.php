@@ -21,6 +21,13 @@ use theme_brandable\local\inspector\inspector;
 use theme_brandable\local\validation\scss_compiler;
 use theme_brandable\local\validation\validation_exception;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(scope::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(page_context::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(resolver::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(scss::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\local\validation\validator::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(revision_manager::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\external\change_scope::class)]
 /**
  * Tests for the scope of the overrides (site, pagetype, page, course, cm).
  *
@@ -36,13 +43,6 @@ use theme_brandable\local\validation\validation_exception;
  * @covers     \theme_brandable\local\overrides\revision_manager
  * @covers     \theme_brandable\external\change_scope
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(scope::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(page_context::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(resolver::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(scss::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\local\validation\validator::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(revision_manager::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\external\change_scope::class)]
 final class scope_test extends \advanced_testcase {
     /** @var \stdClass Course. */
     private \stdClass $course;

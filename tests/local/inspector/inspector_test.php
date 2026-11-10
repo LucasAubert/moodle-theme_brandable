@@ -19,6 +19,9 @@ namespace theme_brandable\local\inspector;
 use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\revision_manager;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(inspector::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(sampler::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\output\mustache\recording_template::class)]
 /**
  * Tests for the page inspector.
  *
@@ -30,9 +33,6 @@ use theme_brandable\local\overrides\revision_manager;
  * @covers     \theme_brandable\local\inspector\sampler
  * @covers     \theme_brandable\output\mustache\recording_template
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(inspector::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(sampler::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\output\mustache\recording_template::class)]
 final class inspector_test extends \advanced_testcase {
     #[\Override]
     protected function setUp(): void {

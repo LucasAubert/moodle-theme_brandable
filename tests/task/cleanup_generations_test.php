@@ -18,6 +18,7 @@ namespace theme_brandable\task;
 
 use theme_brandable\local\generator\generation_manager;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(cleanup_generations::class)]
 /**
  * Tests for the generations cleanup task.
  *
@@ -27,7 +28,6 @@ use theme_brandable\local\generator\generation_manager;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \theme_brandable\task\cleanup_generations
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(cleanup_generations::class)]
 final class cleanup_generations_test extends \advanced_testcase {
     /**
      * Inserts a generation.

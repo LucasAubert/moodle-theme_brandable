@@ -29,6 +29,10 @@ use theme_brandable\local\overrides\change;
 use theme_brandable\local\overrides\resolver;
 use theme_brandable\local\overrides\revision_manager;
 
+#[\PHPUnit\Framework\Attributes\CoversClass(consent::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(generation_manager::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\local\generator\mock_generator::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(set_js_consent::class)]
 /**
  * Tests for the activation of the generated JavaScript (contract 12.7, spec B1 to B4): consent, 409, deactivation,
  * kill switch, notification of a new text, needsJsActivation and the request sent again.
@@ -42,10 +46,6 @@ use theme_brandable\local\overrides\revision_manager;
  * @covers     \theme_brandable\local\generator\mock_generator
  * @covers     \theme_brandable\external\set_js_consent
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(consent::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(generation_manager::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\theme_brandable\local\generator\mock_generator::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(set_js_consent::class)]
 final class consent_test extends \advanced_testcase {
     /** @var string A valid site key. */
     private const KEY = 'bsk_9fQxAbCdEfGhIjKlMnOpQrStUvWxYz0123456789-_A';

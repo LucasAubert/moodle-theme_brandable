@@ -27,7 +27,7 @@ namespace theme_brandablert\brandable;
  * Routed pages (Moodle 5.x router, r.php) all run the same script: their key comes from the route path
  * (request path after r.php, numeric segments such as ids removed): /r.php/course/12/manage -> bp-course-manage.
  *
- * @package    theme_brandablert
+ * @package    theme_brandable
  * @copyright  2026 Lucas Aubert
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
