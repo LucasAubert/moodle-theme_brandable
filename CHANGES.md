@@ -3,6 +3,35 @@
 One section per release, newest first: `## <release> (<version>) - <date>`, then the notes in English (required),
 then in French. Brandable reads these notes when it publishes a release.
 
+## 0.4.0 (2026111100) - 2026-11-11
+
+### English
+
+- The editor tells when the parent theme applies something after Brandable: a custom CSS of its own, a dark mode of
+  its own.
+- Parent themes that build their own branding: the logos of Brandable replace theirs in the navigation bar and on the
+  login page.
+- The editor lists the templates Brandable overrides whose original changed since (another parent theme, a Moodle
+  upgrade), to be reviewed.
+- Fixed: the CSS of a draft could be ignored by the browser in the preview when the parent theme triggers a debugging
+  message while it is compiled, with debugging messages displayed.
+- Fixed: the consent of the generated JavaScript closed by itself while a published version was waiting for its cloud
+  backup (the editor reads its state again every 5 seconds meanwhile).
+- Exported themes carry the runtime 1.3.2 (the same logos of the parent theme replaced).
+
+### Français
+
+- L'éditeur signale ce que le thème parent applique après Brandable : un CSS personnalisé à lui, un mode sombre à lui.
+- Thèmes parents qui construisent leur propre en-tête de marque : les logos de Brandable remplacent les leurs dans la
+  barre de navigation et sur la page de connexion.
+- L'éditeur liste les templates surchargés par Brandable dont l'original a changé depuis (autre thème parent, mise à
+  jour de Moodle), à revoir.
+- Corrigé : dans l'aperçu, le navigateur pouvait ignorer le CSS d'un brouillon quand le thème parent déclenche un
+  message de débogage pendant sa compilation, avec l'affichage du débogage activé.
+- Corrigé : le consentement au JavaScript généré se refermait tout seul pendant qu'une version publiée attendait sa
+  sauvegarde dans le cloud (l'éditeur relit alors son état toutes les 5 secondes).
+- Les thèmes exportés embarquent le runtime 1.3.2 (même remplacement des logos du thème parent).
+
 ## 0.3.0 (2026111000) - 2026-11-10
 
 ### English

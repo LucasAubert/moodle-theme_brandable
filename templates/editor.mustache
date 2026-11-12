@@ -40,6 +40,8 @@
     * markers - Whether the template markers are enabled in the preview
     * colourmodes - Colour modes of the site: available, enabled, default (JSON)
     * colourmodesenabled - Whether the colour modes are on (light / dark switch of the preview)
+    * notices, hasparentnotices - What the parent theme does after Brandable (theme_brandable/editor_parentnotices)
+    * outdated, hasoutdated - Overridden templates whose original changed (theme_brandable/editor_outdatedtemplates)
     * user - Personal data of the current user, removed from the captured elements (JSON)
 
     Example context (json):
@@ -61,6 +63,10 @@
         "markers": true,
         "colourmodes": "{\"available\":true,\"enabled\":true,\"default\":\"light\"}",
         "colourmodesenabled": true,
+        "notices": [],
+        "hasparentnotices": false,
+        "outdated": [],
+        "hasoutdated": false,
         "user": "{}"
     }
 }}
@@ -130,6 +136,8 @@
         </div>
         <div class="tbe-proposal" data-region="cloudproposal" role="status" hidden></div>
         {{#pluginupdate}}{{> theme_brandable/editor_pluginupdate }}{{/pluginupdate}}
+        {{#hasparentnotices}}{{> theme_brandable/editor_parentnotices }}{{/hasparentnotices}}
+        {{#hasoutdated}}{{> theme_brandable/editor_outdatedtemplates }}{{/hasoutdated}}
         <div class="tbe-upgrade" data-region="pluginupgrade" hidden></div>
         <div class="tbe-thread" data-region="thread" aria-live="polite" {{^connected}}hidden{{/connected}}></div>
 

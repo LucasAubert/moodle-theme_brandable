@@ -89,6 +89,9 @@ let cloudTimer = null;
 /** @type {Map} Errors of the JavaScript modules in the page of the preview, by target (spec B11). */
 const jsErrors = new Map();
 
+/** @type {Object|null} Consent panel open ({id, consent, warning}): shown again when the thread is rendered again. */
+let jsConsentOpen = null;
+
 /**
  * @type {Object|null} Purchase or change of plan started from the editor, until /account shows it (contract 5):
  * {state: billingstate before, started: time}.
@@ -418,6 +421,9 @@ const render = async(current) => {
     });
     const thread = region('thread');
     Templates.replaceNodeContents(thread, html, js);
+    if (jsConsentOpen) {
+        await showJsConsent(jsConsentOpen.id, jsConsentOpen.consent, jsConsentOpen.warning, false);
+    }
     await showUpgrade(current.pluginupgrade);
     if (generation) {
         await renderGeneration(generation);
@@ -1293,8 +1299,9 @@ const jsConsentRegion = (id) => region('thread').querySelector(`[data-generation
  * @param {Number} id Generation.
  * @param {Object|null} consent Text and state already read (get_js_consent), null to read them.
  * @param {String} warning Shown above the text (the text changed), empty if none.
+ * @param {Boolean} focus Focus its button (not when the thread is only rendered again).
  */
-const showJsConsent = async(id, consent = null, warning = '') => {
+const showJsConsent = async(id, consent = null, warning = '', focus = true) => {
     let current = consent;
     if (!current) {
         try {
@@ -1306,8 +1313,10 @@ const showJsConsent = async(id, consent = null, warning = '') => {
     }
     const place = jsConsentRegion(id);
     if (!place) {
+        jsConsentOpen = null;
         return;
     }
+    jsConsentOpen = {id, consent: current, warning};
     // Plain text: paragraphs separated by an empty line, escaped by the template.
     const paragraphs = current.text.split(/\r?\n\s*\r?\n/).map((p) => p.trim()).filter((p) => p !== '');
     const {html, js} = await Templates.renderForPromise('theme_brandable/editor_jsconsent', {
@@ -1324,7 +1333,9 @@ const showJsConsent = async(id, consent = null, warning = '') => {
     if (activate) {
         activate.hidden = true;
     }
-    place.querySelector('[data-action="jsaccept"], [data-action="jsresend"]')?.focus();
+    if (focus) {
+        place.querySelector('[data-action="jsaccept"], [data-action="jsresend"]')?.focus();
+    }
 };
 
 /**
@@ -1333,6 +1344,7 @@ const showJsConsent = async(id, consent = null, warning = '') => {
  * @param {Number} id Generation.
  */
 const hideJsConsent = (id) => {
+    jsConsentOpen = null;
     const place = jsConsentRegion(id);
     if (!place) {
         return;
@@ -1370,6 +1382,7 @@ const acceptJs = async(id, version) => {
         await showJsConsent(id, result.consent, result.warning);
         return;
     }
+    jsConsentOpen = null;
     await start(async() => result.generation || Repository.getRevisions().then((current) => {
         render(current);
         return null;

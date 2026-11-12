@@ -25,6 +25,10 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// As theme/styles.php: a debugging message (logged) printed before the CSS would send the headers as text/html, and the
+// browser would ignore the stylesheet. A parent theme may get a renderer of the page in its csspostprocess, for one.
+define('NO_DEBUG_DISPLAY', true);
+
 require(__DIR__ . '/../../config.php');
 
 $revisionid = required_param('rev', PARAM_INT);
@@ -32,6 +36,7 @@ $rtl = optional_param('rtl', 0, PARAM_BOOL);
 
 require_login(null, false);
 require_capability('theme/brandable:edit', context_system::instance());
+$PAGE->set_context(context_system::instance());
 // Compiling can take a few seconds: do not block the other requests of the iframe.
 \core\session\manager::write_close();
 

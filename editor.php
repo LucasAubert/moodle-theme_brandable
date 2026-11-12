@@ -47,6 +47,13 @@ $PAGE->add_body_class('theme-brandable-editor-page');
 \theme_brandable\local\brand::require_styles();
 $PAGE->requires->js_call_amd('theme_brandable/editor', 'init', ['[data-region="theme-brandable-editor"]']);
 
+$notices = \theme_brandable\local\parent_notices::get();
+// Overrides of the draft (the published version when nothing changed) made from another original: parent or Moodle changed.
+$outdated = \theme_brandable\local\overrides\outdated::templates(
+    \theme_brandable\local\overrides\resolver::get_map(\theme_brandable\local\overrides\revision_manager::get_draft()
+        ?: \theme_brandable\local\overrides\revision_manager::get_published())
+);
+
 echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('theme_brandable/editor', [
     'previewurl' => $previewurl->out(false),
@@ -82,6 +89,11 @@ echo $OUTPUT->render_from_template('theme_brandable/editor', [
     // Colour modes of Moodle 5.3 (spec CM5): the light / dark switch of the preview, and the checks in both modes.
     'colourmodes' => json_encode(\theme_brandable\local\colour_modes::to_context()),
     'colourmodesenabled' => \theme_brandable\local\colour_modes::enabled(),
+    // What the parent theme applies after Brandable: its custom CSS, its own dark mode.
+    'notices' => $notices,
+    'hasparentnotices' => !empty($notices),
+    'outdated' => $outdated,
+    'hasoutdated' => !empty($outdated),
     // Removed from the elements captured by the picker before they are sent to the generator.
     'user' => json_encode([
         'fullname' => fullname($USER),

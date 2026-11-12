@@ -31,6 +31,12 @@ and later. No Composer step and no other plugin are needed.
 The parent theme is chosen in the settings of Brandable: Boost by default, or any installed theme that does not
 itself inherit from Brandable. Classic was removed from core in Moodle 5.3; there, it is available as a plugin.
 
+The editor tells when the parent theme applies something after Brandable: a custom CSS of its own, added after the
+changes of Brandable, or a dark mode of its own, which recolours them (contrasts are only checked in the light mode).
+
+Changing the parent theme keeps the published design: the templates it overrides whose original differs in the new
+parent (or after a Moodle upgrade) are listed in the editor, to be reviewed.
+
 ## Installation
 
 1. Install the zip from *Site administration > Plugins > Install plugins*, or extract it into `theme/brandable`

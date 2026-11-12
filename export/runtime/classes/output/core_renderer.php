@@ -50,6 +50,34 @@ class core_renderer extends core_renderer_base {
     }
 
     /**
+     * Branding of the parent themes that build their navigation bar and login panel from logo settings of their own
+     * (a get_branding_context() method) instead of {@see get_logo_url()}: the logos of the version replace them when it
+     * sets them. The dark logos too, as the version has one logo; the modes of the parent without a logo are left alone.
+     *
+     * @return array|false Context of the branding template of the parent, false when it shows no logo.
+     */
+    public function get_branding_context() {
+        if (!method_exists(parent::class, 'get_branding_context')) {
+            return false;
+        }
+        $context = parent::get_branding_context();
+        if (!is_array($context) || during_initial_install()) {
+            return $context;
+        }
+        $logo = assets::setting('logo', null, 200);
+        $compact = assets::setting('logocompact', 300, 300) ?? $logo;
+        if ($logo !== null && isset($context['logourl'])) {
+            $context['logourl'] = $logo->out(false);
+            $context['darklogourl'] = $logo->out(false);
+        }
+        if ($compact !== null && isset($context['logominiurl'])) {
+            $context['logominiurl'] = $compact->out(false);
+            $context['darklogominiurl'] = $compact->out(false);
+        }
+        return $context;
+    }
+
+    /**
      * Returns the URL of the favicon: the one of the version when it sets it, else the parent's behaviour.
      *
      * @return \moodle_url

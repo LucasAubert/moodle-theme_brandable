@@ -624,6 +624,11 @@ body.theme-brandable-editor-page {
 .tbe .tbe-pluginupdate-notes .tbe-version-note p {
     margin: 0;
 }
+/* What the parent theme applies after Brandable, templates to review. */
+.tbe .tbe-parentnotices ul {
+    margin: 4px 0 0;
+    padding-left: 18px;
+}
 /* Update of the plugin required (spec U2): the screen replaces the thread and the composer. */
 .tbe .tbe-upgrade {
     flex: 1;
