@@ -3,6 +3,22 @@
 One section per release, newest first: `## <release> (<version>) - <date>`, then the notes in English (required),
 then in French. Brandable reads these notes when it publishes a release.
 
+## 0.4.1 (2026111200) - 2026-11-12
+
+### English
+
+- Fixed: an address being typed in the address bar of the preview was replaced when a page of the preview finished
+  loading.
+- Fixed: a prompt was sent with the address typed in the bar, not yet opened, as its page; it is now sent with the
+  page shown in the preview.
+
+### Français
+
+- Corrigé : une adresse en cours de saisie dans la barre d'adresse de l'aperçu était remplacée quand une page de
+  l'aperçu finissait de charger.
+- Corrigé : un prompt partait avec, pour page, l'adresse tapée dans la barre sans être encore ouverte ; il part
+  désormais avec la page affichée dans l'aperçu.
+
 ## 0.4.0 (2026111100) - 2026-11-11
 
 ### English

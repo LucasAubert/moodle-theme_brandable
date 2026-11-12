@@ -117,6 +117,12 @@ let countryRequired = false;
 /** @type {String} Billing country chosen by the administrator (kept when the offers are rendered again). */
 let chosenCountry = '';
 
+/** @type {String} Address of the page shown in the preview, empty until its first load (then the one of the bar). */
+let previewUrl = '';
+
+/** @type {Boolean} Whether the address in the bar was typed since the preview last showed a page. */
+let urlTyped = false;
+
 /** @type {String|null} Colour mode chosen for the preview (light or dark), null: the one the page was rendered in. */
 let previewMode = null;
 
@@ -1064,12 +1070,19 @@ const pick = (element) => {
 };
 
 /**
+ * Address of the page shown in the preview: the one sent with a prompt, not an address typed but not opened yet.
+ *
+ * @returns {String}
+ */
+const shownUrl = () => previewUrl || region('url').value;
+
+/**
  * Sends the prompt of the composer.
  */
 const sendPrompt = () => {
     const prompt = region('prompt').value.trim();
     if (prompt) {
-        submit(prompt, region('url').value, selection, true, answering ? answering.id : 0,
+        submit(prompt, shownUrl(), selection, true, answering ? answering.id : 0,
             Assets.getAttachments().map((asset) => asset.id));
     }
 };
@@ -1101,7 +1114,7 @@ const retry = async(id) => {
         await submit(failed.prompt, '', null, false, 0, [], id);
         return;
     }
-    await submit(failed.prompt, failed.pageurl || region('url').value, targeted, false, failed.questionid,
+    await submit(failed.prompt, failed.pageurl || shownUrl(), targeted, false, failed.questionid,
         failed.attachments || []);
 };
 
@@ -1629,7 +1642,12 @@ const handleFrameLoad = () => {
         frame.src = root.dataset.wwwroot + '/';
         return;
     }
-    region('url').value = location.href;
+    previewUrl = location.href;
+    // An address being typed in the bar stays: the page that finished loading does not replace it.
+    if (!urlTyped || document.activeElement !== region('url')) {
+        region('url').value = previewUrl;
+        urlTyped = false;
+    }
     applyPreviewMode();
     if (selection && selectionPage && location.href !== selectionPage) {
         // The targeted element belongs to the page left.
@@ -1772,13 +1790,17 @@ export const init = async(selector) => {
             return Repository.getRevisions();
         });
     });
+    region('url').addEventListener('input', () => {
+        urlTyped = true;
+    });
     region('urlbar').addEventListener('submit', (e) => {
         e.preventDefault();
+        urlTyped = false;
         const url = toSiteUrl(region('url').value);
         if (url) {
             region('frame').src = url.href;
         } else {
-            region('url').value = region('frame').src;
+            region('url').value = shownUrl();
         }
     });
     region('composer').addEventListener('submit', (e) => {

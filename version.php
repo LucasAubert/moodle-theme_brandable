@@ -25,11 +25,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'theme_brandable';
-$plugin->version = 2026111100;
+$plugin->version = 2026111200;
 $plugin->requires = 2024100700; // Moodle 4.5.
 $plugin->supported = [405, 503]; // 4.5 LTS to 5.3 LTS (5.0 included by the range, not tested).
 $plugin->maturity = MATURITY_BETA;
-$plugin->release = '0.4.0';
+$plugin->release = '0.4.1';
 $plugin->dependencies = [
     'theme_boost' => 2024100700,
 ];
